@@ -1,364 +1,273 @@
 <!DOCTYPE html>
-<html>
+<html lang="en" class="fontawesome-i2svg-active fontawesome-i2svg-complete">
 <head>
-  <title>DiffCBF</title>
-    <style>
-        .hidden {
-            display: none;
-        }
-    </style>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <meta charset="utf-8">
-    <meta name="description"
-        content="Safe Offline Reinforcement Learning with Feasibility-Guided Diffusion Model">
-    <meta name="keywords" content="DiffCBF, Safety, Reinforcement Learning, Diffusion Model, Safe Offline Reinforcement Learning, Offline Reinforcement Learning, AI">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title> Safe Offline Reinforcement Learning with Feasibility-Guided Diffusion Model</title>
+  <meta charset="utf-8">
+  <meta name="description"
+        content="EpiFlow: Epigraph-Guided Flow Matching for Safe and Performant Offline Reinforcement Learning">
+  <meta name="keywords" content="EpiFlow, Epigraph, Flow Matching, Safe Offline RL, Reinforcement Learning, Safety, Optimal Control">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EpiFlow: Epigraph-Guided Flow Matching for Safe and Performant Offline RL</title>
 
-    <link rel="icon" href="./assets/icon.png">
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
+        rel="stylesheet">
 
-    <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
 
-    <link rel="stylesheet" href="./assets/css/bulma.min.css">
-    <link rel="stylesheet" href="./assets/css/bulma-carousel.min.css">
-    <link rel="stylesheet" href="./assets/css/bulma-slider.min.css">
-    <link rel="stylesheet" href="./assets/css/fontawesome.all.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
-
-    <script defer src="./assets/js/fontawesome.all.min.js"></script>
-
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script src="./static/js/bulma-carousel.min.js"></script>
+  <script src="./static/js/bulma-slider.min.js"></script>
+  <script src="./static/js/index.js"></script>
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      jax: ["input/TeX", "output/HTML-CSS"],
+      extensions: ["tex2jax.js"],
+      "HTML-CSS": { preferredFont: "TeX", availableFonts: ["STIX","TeX"] },
+      tex2jax: { inlineMath: [ ["$", "$"], ["\\(","\\)"] ], displayMath: [ ["$$","$$"], ["\\[", "\\]"] ], processEscapes: true, ignoreClass: "tex2jax_ignore|dno" },
+      TeX: { noUndefined: { attributes: { mathcolor: "red", mathbackground: "#FFEEEE", mathsize: "90%" } } },
+      messageStyle: "none"
+    });
+  </script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js"></script>
 </head>
-
 <body>
 
-<nav class="navbar" role="navigation" aria-label="main navigation">
-    <div class="navbar-brand">
-        <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
-        <span aria-hidden="true"></span>
-        <span aria-hidden="true"></span>
-        <span aria-hidden="true"></span>
-        </a>
-    </div>
-    <div class="navbar-menu">
-        <div class="navbar-start" style="flex-grow: 1; justify-content: center;">
-        <div class="navbar-item has-dropdown is-hoverable">
-            <a class="navbar-link">
-            More Research
-            </a>
-            <div class="navbar-dropdown">
-            <a class="navbar-item" href="https://zhengyinan-air.github.io/Diffusion-Planner/">
-                <b>Diffusion Planner: Diffusion-based Autonomous Driving Planning (ICLR 2025 Oral)</b> <p style="font-size:18px; display: inline; margin-left: 5px;"></p>
-            </a>
-            <a class="navbar-item" href="https://2toinf.github.io/DecisionNCE/">
-                <b>DecisionNCE: Representation Pretrain for Robotics</b> <p style="font-size:18px; display: inline; margin-left: 5px;"></p>
-            </a>
-            </a>
-            </div>
-        </div>
-        </div>
-    
-    </div>
-</nav>
-
-      
-<section class="hero">
+  <section class="hero">
     <div class="hero-body">
-        <div class="container is-max-desktop">
+      <div class="container is-max-desktop">
         <div class="columns is-centered">
-            <div class="column has-text-centered">
-            <h1 class="title is-1 publication-title is-bold">
-                <img src="./assets/icon.png" style="width:1em;vertical-align: middle" alt="Logo"/> 
-                <span class="mmmu" style="vertical-align: middle">DiffCBF</span>
-                </h1>
-            <h2 class="subtitle is-3 publication-subtitle">
-                Safe Offline Reinforcement Learning with Feasibility-Guided Diffusion Model
-                <!-- <br>
-                and Reasoning Benchmark for Expert AGI -->
-            </h2>
+          <div class="column has-text-centered">
+            <h1 class="title is-1 publication-title">Epigraph-Guided Flow Matching for Safe and Performant Offline Reinforcement Learning</h1>
             <div class="is-size-5 publication-authors">
-                <span class="author-block">Yinan Zheng*<sup style="color:#007bff;">†,1,2</sup>,</span>
-                <span class="author-block">Jianxiong Li*<sup style="color:#007bff;">1,2</sup>,</span>
-                <span class="author-block">Dongjie Yu<sup style="color:#ed4b82;">3</sup>,</span>
-                <span class="author-block">Yujie Yang<sup style="color:#6fbf73;">2</sup>,</span><br>
-                <span class="author-block">Shengbo Eben Li<sup style="color:#6fbf73;">2</sup>,</span>
-                <span class="author-block">Xianyuan Zhan<sup style="color:#ffac33;">✉,1,4</sup>,</span>
-                <span class="author-block">Jingjing Liu<sup style="color:#007bff;">✉,1,2</sup>,</span>
-            </div>
-            
-            <br>
-            
-            <div class="is-size-5 publication-authors">
-                <span class="author-block"><sup style="color:#007bff;">1</sup>Institute for AI Industry Research (AIR), Tsinghua University</span><br>
-                <span class="author-block"><sup style="color:#6fbf73;">2</sup>School of Vehicle and Mobility, Tsinghua University</span><br>
-                <span class="author-block"><sup style="color:#ed4b82;">3</sup>Department of Computer Science, The University of Hong Kong</span><br>
-                <span class="author-block"><sup style="color:#ffac33;">4</sup>Shanghai Artificial Intelligence Laboratory</span></br>
-            </div>
-    
-            <br>
-            <div class="is-size-5 publication-authors">
-                <span class="author-block">*Equal contribution, ✉Corresponding author</span><br>
-                <span class="author-block">†Project Lead:</span>
-                <span class="author-block"><a href="mailto:zhengyn23@mails.tsinghua.edu.cn">zhengyn23@mails.tsinghua.edu.cn</a></span>
-            </div>
-            
-    
-            <div class="column has-text-centered">
-                <div class="publication-links">
-                <!-- PDF Link. -->
-                <span class="link-block">
-                  <a href="https://arxiv.org/pdf/2401.10700.pdf"
-                      class="external-link button is-normal is-rounded is-dark">
-                  <span class="icon">
-                      <i class="fas fa-file-pdf"></i>
-                  </span>
-                  <span>Arxiv</span>
-                  </a>
+              <span class="author-block">
+                <a href="https://tayalmanan28.github.io/">Manan Tayal</a><sup>1</sup>,
               </span>
+              <span class="author-block">
+                <a href="https://mumukshtayal.github.io/">Mumuksh Tayal</a><sup>1</sup>,
+              </span>
+            </div>
+
+            <div class="is-size-5 publication-authors">
+              <span class="author-block"><sup>1</sup> Tau Intelligence</span>
+            </div>
+
+            <div class="column has-text-centered">
+              <div class="publication-links">
+                <!-- PDF Link -->
                 <span class="link-block">
-                    <a href="https://openreview.net/forum?id=j5JvZCaDM0"
-                        class="external-link button is-normal is-rounded is-dark">
+                  <a href="https://arxiv.org/pdf/2602.08054"
+                     class="external-link button is-normal is-rounded is-dark">
                     <span class="icon">
                         <i class="fas fa-file-pdf"></i>
                     </span>
-                    <span>Openreview</span>
-                    </a>
+                    <span>Paper</span>
+                  </a>
                 </span>
+                <!-- arXiv Link -->
                 <span class="link-block">
-                    <!-- @TODO: change links -->
-                    <a href="https://cloud.tsinghua.edu.cn/d/0d2939f7f7234cf68f1d/"
-                        class="external-link button is-normal is-rounded is-dark">
+                  <a href="https://arxiv.org/abs/2602.08054"
+                     class="external-link button is-normal is-rounded is-dark">
                     <span class="icon">
-                        <p style="font-size:18px">🔗</p>
-                        <!-- 🔗 -->
+                        <i class="ai ai-arxiv"></i>
                     </span>
-                    <span>Dataset</span>
-                    </a>
+                    <span>arXiv</span>
+                  </a>
                 </span>
+                <!-- Code Link -->
                 <span class="link-block">
-                    <a href="https://github.com/ZhengYinan-AIR/DiffCBF"
-                        class="external-link button is-normal is-rounded is-dark">
+                  <a class="external-link button is-normal is-rounded is-dark" style="pointer-events: none; opacity: 0.6;" title="Code coming soon">
                     <span class="icon">
                         <i class="fab fa-github"></i>
                     </span>
-                    <span>Code</span>
-                    </a>
+                    <span>Code (Coming Soon)</span>
+                  </a>
                 </span>
-
-                </div>
-    
+              </div>
             </div>
-            </div>
-        </div>
-        </div>
-    </div>
-</section>
-<style>
-    .center {
-      display: block;
-      margin-left: auto;
-      margin-right: auto;
-      width: 80%;
-    }
-</style>
-
-<section class="hero teaser">
-<div class="container is-max-desktop">
-        <div class="content has-text-centered">
-        <img src="./assets/framework.jpg" alt="geometric reasoning" width="100%"/>
-        </div>
-</div>
-</section>
-
-<section class="section">
-    <div class="container" style="margin-bottom: 2vh;">
-      <!-- Abstract. -->
-      <div class="columns is-centered has-text-centered">
-        <div class="column is-four-fifths">
-          <h2 class="title is-3">🔔News</h2>
-          <div class="content has-text-justified">
-            <p>
-              <b>🔥[2024-01-16]: Our paper <a href="https://openreview.net/forum?id=j5JvZCaDM0">Safe Offline Reinforcement Learning with Feasibility-Guided Diffusion Model</a> has been accepted by ICLR 2024.</b>
-              <!-- <b>[2023-11-27]: Our evaluation server for the test set is now available on <a href="https://eval.ai/web/challenges/challenge-page/2179/overview">EvalAI</a>. We welcome all submissions and look forward to your participation! 😆</b> -->
-            </p>
-        </div>      
-          <h2 class="title is-3">Abstract</h2>
-          <div class="content has-text-justified">
-            <p><strong>
-                How can we train a diffusion policy to satisfy hard constraints using only supervised objectives, without employing iterative Lagrangian-based methods?
-            </strong>
-            </p>
-            <p>
-                Safe offline reinforcement learning is a promising way to bypass risky online interactions towards safe policy learning. Most existing methods only enforce soft constraints, i.e., constraining safety violations in expectation below thresholds predetermined. This can lead to potentially unsafe outcomes, thus unacceptable in safety-critical scenarios.
-                An alternative is to enforce the hard constraint of zero violation. However, this can be challenging in offline setting, as it needs to strike the right balance among three highly intricate and correlated aspects: safety constraint satisfaction, reward maximization, and behavior regularization imposed by offline datasets.
-                Interestingly, we discover that via reachability analysis of safe-control theory, the hard safety constraint can be equivalently translated to identifying the largest feasible region given the offline dataset. This seamlessly converts the original trilogy problem to a feasibility-dependent objective, i.e., maximizing reward value within the feasible region while minimizing safety risks in the infeasible region. Inspired by these, we propose DiffCBF (FeasIbility-guided Safe Offline RL), which allows safety constraint adherence, reward maximization, and offline policy learning to be realized via three decoupled processes, while offering strong safety performance and stability. In DiffCBF, the optimal policy for the translated optimization problem can be derived in a special form of weighted behavior cloning, which can be effectively extracted with a guided diffusion model thanks to its expressiveness. Moreover, we propose a novel energy-guided sampling method that does not require training a complicated time-dependent classifier to simplify the training.
-                We compare DiffCBF against baselines on DSRL benchmark for safe offline RL. Evaluation results show that DiffCBF is the only method that can guarantee safety satisfaction in all tasks, while achieving top returns in most tasks.
-            </p>
           </div>
         </div>
       </div>
-      <!--/ Abstract. -->
-  </div>
-</section>
-
-<!-- Methods SECTION -->
-<section class="hero is-light is-small">
-    <div class="hero-body has-text-centered">
-      <h1 class="title is-1 mmmu">Methods</h1>
     </div>
   </section>
 
-
-<section class="section">
-    <div class="container">
-      <div class="columns is-centered has-text-centered">
-        <!-- <div class="column is-full-width has-text-centered"> -->
-        <div class="column is-four-fifths">
-            <h2 class="title is-3">Offline Identification of Feasibility</h2>
-          <div class="content has-text-justified">
-          <p>
-            We can predetermine the approximately largest feasible region using offline datasets, <b>without the need to train a policy</b>. Compared to the commonly used cost state-value function, our approach yields a lower approximation error.
-        </p>
-          <div class="content has-text-centered">
-            <img src="./assets/qh.jpg" alt="algebraic reasoning" class="center">
-            <p><b><i>Figure 1:</i></b> (a) Reach-avoid control task: the agent (red) aim to reach the goal (green) while avoiding hazards (blue). (b) Offline data distribution. (c)-(e) Comparisons with the  feasible region learned by feasible value 
-                {s|V*_h(s)&lt=0} and cost value {s|V*_c(s)&lt=1e-3}.</p>
+  <!-- Abstract -->
+  <section class="hero is-light">
+    <div class="hero-body">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered has-text-centered">
+          <div class="column">
+            <h2 class="title is-3">Abstract</h2>
           </div>
         </div>
-        </div>
-      </div>
-
-</section>    
-
-<section class="section">
-    <div class="container">
-      <div class="columns is-centered has-text-centered">
-        <!-- <div class="column is-full-width has-text-centered"> -->
-        <div class="column is-four-fifths">
-            <h2 class="title is-3">Feasibility-Guided Diffusion Model</h2>
-          <div class="content has-text-justified">
-          <p>
-            We propose a feasibility-dependent objective, i.e., 
-            <b>maximizing reward value within the feasible region while minimizing safety risks in the infeasible region</b>.
-            In DiffCBF, the optimal policy for the optimization problem can be derived in a special form of weighted behavior cloning.
-            Moreover, we propose a novel energy-guided sampling method that <b>does not require training a complicated time-dependent classifier</b> to simplify the training. <b>No more Lagrangian.</b>
-            
-            </p>
-          <div class="content has-text-centered">
-            <img src="./assets/framework.jpg" alt="algebraic reasoning" class="center">
-            <p><b><i>Figure 2:</i></b> Feasibility-guided diffusion model with time-independent classifier-guided sampling method.</p>
+        <div class="columns is-centered has-text-centered">
+          <div class="column is-four-fifths">
+            <div class="content has-text-justified" style="padding-top: 1%">
+              <p>
+                Offline reinforcement learning (RL) provides a compelling paradigm for training autonomous systems without the risks of online exploration, particularly in safety-critical domains. However, jointly achieving strong safety and performance from fixed datasets remains challenging. Existing safe offline RL methods often rely on soft constraints that allow violations, introduce excessive conservatism, or struggle to balance safety, reward optimization, and adherence to the data distribution. To address this, we propose <b>Epigraph-Guided Flow Matching (EpiFlow)</b>, a framework that formulates safe offline RL as a state-constrained optimal control problem to co-optimize safety and performance. We learn a feasibility value function derived from an epigraph reformulation of the optimal control problem, thereby avoiding the decoupled objectives or post-hoc filtering common in prior work. Policies are synthesized by reweighting the behavior distribution based on this epigraph value function and fitting a generative policy via flow matching, enabling efficient, distribution-consistent sampling. Across various safety-critical tasks, including Safety-Gymnasium benchmarks, EpiFlow achieves competitive returns with near-zero empirical safety violations, demonstrating the effectiveness of epigraph-guided policy synthesis.
+              </p>
+            </div>
           </div>
         </div>
-        </div>
       </div>
-
-</section>    
-
-<!-- RESULTS SECTION -->
-<section class="hero is-light is-small">
-    <div class="hero-body has-text-centered">
-      <h1 class="title is-1 mmmu">Experiment Results</h1>
     </div>
   </section>
 
-  
-
-<section class="section">
-    <div class="container">
-      <div class="columns is-centered has-text-centered">
-        <!-- <div class="column is-full-width has-text-centered"> -->
-        <div class="column is-four-fifths">
-          <h2 class="title is-3">Main Results</h2>
-          <div class="content has-text-centered">
-            <img src="./assets/mainresult.jpg" alt="algebraic reasoning" class="center">
-            <p><b><i>Table 1:</i></b> Normalized <a href="https://github.com/liuzuxin/DSRL">DSRL</a> benchmark results. Each value is averaged over 20 evaluation episodes and 3 seeds. <span style="color: #0000FF;">Blue</span>: Safe agents with the highest reward. <span style="color: #656565;">Gray</span>: Unsafe agents. <b>Bold</b>: safe agents whose normalized cost is smaller than 1.</p>
+  <!-- Framework Figure -->
+  <section class="hero">
+    <div class="hero-body">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered has-text-centered">
+          <div class="column" style="padding-bottom: 5%">
+            <h2 class="title is-3">Framework</h2>
           </div>
         </div>
-      </div>
-
-</section>      
-
-<section class="section">
-    <div class="container">
-      <div class="columns is-centered has-text-centered">
-        <!-- <div class="column is-full-width has-text-centered"> -->
-        <div class="column is-four-fifths">
-          <h2 class="title is-3">Soft Constraint Under Different Cost Limits</h2>
-          <div class="content has-text-justified">
-          <p>
-            We evaluate the sensitivity of cost limit selection for soft-constraint-based methods to demonstrate the effectiveness of hard constraint. 
-            Results shows that most soft-constraint-based methods are highly sensitive to the value of cost limit. In some cases, choosing a small cost limit even leads to an increase in the final cost. ]
-            This shows that it is difficult for these methods to select the right cost limit to achieve the best performance, which requires task-specific tuning. 
-            In contrast, our algorithm, which considers hard constraints, does not encounter this issue and achieves superior results <b>using only one group of hyperparameters</b>.
-
-
+        <div class="columns is-centered has-text-centered">
+          <div class="column">
+            <img src="images/framework.png" width="100%" alt="EpiFlow Framework" style="padding-right: 2%">
+            <p class="has-text-justified" style="padding-top: 2%">
+              <b>EpiFlow Framework.</b> We propose a framework to solve the state-constrained offline RL problem by learning an Auxiliary Value Function, $\hat{V}(x,z)$, using an offline dataset. We formulate an epigraph form for the problem that learns $\hat{V}$, which if satisfied to stay positive, ensures the system stays safe while maximising the objective. We finally learn a policy via flow matching which maximises $\hat{V}$ at all time steps to find the most optimal path that the offline data supports.
             </p>
-          <div class="content has-text-centered">
-            <img src="./assets/cost_limit.jpg" alt="algebraic reasoning" class="center">
-            <p><b><i>Figure 3:</i></b> Soft constraint sensitivity experiments for cost limit. </p>
           </div>
         </div>
-        </div>
       </div>
+    </div>
+  </section>
 
-</section>  
-
-<section class="section">
-    <div class="container">
-      <div class="columns is-centered has-text-centered">
-        <!-- <div class="column is-full-width has-text-centered"> -->
-        <div class="column is-four-fifths">
-          <h2 class="title is-3">Data Quantity Sensitivity Experiment</h2>
-          <div class="content has-text-justified">
-          <p>
-            We select some competitive baselines that achieve relatively good safety and reward performances in Table 1 and train them with 1/2 and 1/10 of the data volume. 
-            DiffCBF still meets safety requirements and demonstrates more stable performance compared to other methods, although a reduction in data volume weakens DiffCBF's safety a little. 
-            We believe DiffCBF enjoys such good stability as it decouples the intricate training processes of safe offline RL, which greatly enhances training performances.
-        </p>
-          <div class="content has-text-centered">
-            <img src="./assets/datavolum.jpg" alt="algebraic reasoning" class="center">
-            <p><b><i>Figure 4:</i></b> Data quantity sensitivity experiment results. </p>
+  <!-- Method Overview -->
+  <section class="hero is-light">
+    <div class="hero-body">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered has-text-centered">
+          <div class="column">
+            <h2 class="title is-3">Method Overview</h2>
           </div>
         </div>
+        <div class="columns is-centered">
+          <div class="column is-four-fifths">
+            <div class="content has-text-justified" style="padding-top: 1%">
+              <p>
+                EpiFlow addresses the challenge of co-optimizing safety and performance in offline RL through three key components:
+              </p>
+              <ol>
+                <li>
+                  <b>Epigraph Reformulation:</b> We reformulate the state-constrained value function as a two-stage optimization. The original value function $V(x)$ is characterized as the largest performance threshold feasible under safety:
+                  $$V(x) = \sup\{z \in \mathbb{R} \mid \hat{V}(x,z) \geq 0\}$$
+                  where the auxiliary epigraph value function $\hat{V}(x,z)$ evaluates whether a given performance threshold $z$ is jointly feasible with safety.
+                </li>
+                <li>
+                  <b>Data-Driven Bellman Recursion:</b> The auxiliary value function satisfies a Bellman-style recursion:
+                  $$\hat{V}(x_t, z_t) = \min\{\ell(x_t),\; \gamma\, \hat{V}(x_{t+1}, z_{t+1})\}$$
+                  which we learn from offline transitions using expectile regression to approximate the implicit policy maximization without querying out-of-distribution actions.
+                </li>
+                <li>
+                  <b>Epigraph-Guided Flow Matching:</b> Policies are synthesized via weighted Flow Matching, where the epigraph-guided weights $w(x,a) = \exp(\alpha \hat{A}(x,a; z^\star(x)))$ reweight the behavior distribution, and a learned vector field generates safe, high-performing actions via a single ODE integration at inference.
+                </li>
+              </ol>
+            </div>
+          </div>
         </div>
       </div>
+    </div>
+  </section>
 
-</section>   
+  <!-- Results -->
+  <section class="hero">
+    <div class="hero-body">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered has-text-centered">
+          <div class="column" style="padding-bottom: 5%">
+            <h2 class="title is-3">Results</h2>
+          </div>
+        </div>
+        <div class="columns is-centered has-text-centered">
+          <div class="column">
+            <img src="images/results.png" width="100%" alt="Evaluation Results" style="padding-right: 2%">
+            <p class="has-text-justified" style="padding-top: 2%">
+              <b>Evaluation Results.</b> Points towards the left (&larr;) are more safe, and those towards the top (&uarr;) have higher rewards. Evaluated over 500 episodes and 5 seeds. EpiFlow consistently attains high safety rates while maintaining strong performance across all domains, from low-dimensional Boat Navigation to high-dimensional MuJoCo Safe Velocity and Safe Car Navigation tasks.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-<!-- @PAN TODO: bibtex -->
-<section class="section" id="BibTeX">
+  <!-- Boat Environment Analysis -->
+  <section class="hero is-light">
+    <div class="hero-body">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered has-text-centered">
+          <div class="column">
+            <h2 class="title is-3">Boat Environment Analysis</h2>
+          </div>
+        </div>
+        <div class="columns is-centered has-text-centered">
+          <div class="column">
+            <img src="images/boat_analysis.png" width="100%" alt="Boat Environment Analysis" style="padding-right: 2%">
+            <p class="has-text-justified" style="padding-top: 2%">
+              <b>Boat Environment Analysis.</b> (Top): Trajectories for all methods rolled out from 2 distinct initial states, where the circles are obstacles the agent must avoid while reaching the goal. (Bottom): Learned value functions and policy comparisons showing EpiFlow's safe and performant navigation.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Key Contributions -->
+  <section class="hero">
+    <div class="hero-body">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered has-text-centered">
+          <div class="column">
+            <h2 class="title is-3">Key Contributions</h2>
+          </div>
+        </div>
+        <div class="columns is-centered">
+          <div class="column is-four-fifths">
+            <div class="content has-text-justified" style="padding-top: 1%">
+              <ul>
+                <li>We propose <b>Epigraph-guided Flow Matching (EpiFlow)</b>, a framework which casts safe offline RL as a state-constrained optimal control problem, providing a principled path to co-optimize performance and hard safety constraints.</li>
+                <li>We derive a <b>Bellman-style recursion</b> for an auxiliary epigraph value function, enabling the characterization of safe performance envelopes directly from offline data without solving intractable HJB-PDEs.</li>
+                <li>We propose a <b>weighted Flow Matching objective</b> that guides generative policy learning toward safe, high-performing regions of the data distribution, ensuring efficient and distribution-consistent sampling in continuous action spaces.</li>
+                <li>We demonstrate the <b>effectiveness of EpiFlow</b> across a wide range of safety-critical benchmarks, including high-dimensional Safety Gymnasium tasks, showing near-zero safety violations while maintaining high task returns compared to state-of-the-art safe offline RL methods.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BibTeX -->
+  <section class="section" id="BibTeX">
     <div class="container is-max-desktop content">
-      <h2 class="title is-3 has-text-centered">BibTeX</h2>
+      <h2 class="title">BibTeX</h2>
       <pre><code>
-@inproceedings{
-zheng2024safe,
-title={Safe Offline Reinforcement Learning with Feasibility-Guided Diffusion Model},
-author={Yinan Zheng and Jianxiong Li and Dongjie Yu and Yujie Yang and Shengbo Eben Li and Xianyuan Zhan and Jingjing Liu},
-booktitle={The Twelfth International Conference on Learning Representations},
-year={2024},
-url={https://openreview.net/forum?id=j5JvZCaDM0}
-}
-  </code></pre>
+  @article{tayal2026epiflow,
+    title={Epigraph-Guided Flow Matching for Safe and Performant Offline Reinforcement Learning},
+    author={Manan Tayal and Mumuksh Tayal},
+    journal={arXiv preprint arXiv:2602.08054},
+    year={2026}
+  }
+      </code></pre>
     </div>
-</section>
-  
-<footer class="footer">
-<!-- <div class="container"> -->
-    <div class="content has-text-centered">
-    </div>
-    <div class="columns is-centered">
-    <div class="column is-8">
-        <div class="content has-text-centered">
-        <p>
-            This website is website adapted from <a href="https://mmmu-benchmark.github.io/">MMMU</a>, licensed under a <a rel="license"
-                                                href="http://creativecommons.org/licenses/by-sa/4.0/">Creative
-            Commons Attribution-ShareAlike 4.0 International License</a>.
-        </p>
-        </div>
-    </div>
-    </div>
-<!-- </div> -->
+  </section>
 
-</footer>
-
+  <footer class="footer">
+    <div class="container">
+      <div class="content has-text-centered">
+        <a class="icon-link"
+           href="https://arxiv.org/pdf/2602.08054">
+          <i class="fas fa-file-pdf"></i>
+        </a>
+      </div>
+    </div>
+  </footer>
 
 </body>
+</html>
