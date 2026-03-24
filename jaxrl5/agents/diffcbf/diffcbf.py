@@ -426,7 +426,6 @@ class DiffCBF(Agent):
         safe_value = agent.safe_value.apply_gradients(grads=grads)
 
         agent = agent.replace(safe_value=safe_value)
-        print("Yo! Safe value updated.")
 
         return agent, info
     
@@ -461,7 +460,7 @@ class DiffCBF(Agent):
 
         def vz_loss_fn(vz_params) -> Tuple[jnp.ndarray, Dict[str, float]]:
             vz_val = agent.vz.apply_fn({"params": vz_params}, batch["observations"], z)
-            vz_loss = expectile_loss(qz - vz_val, agent.cost_critic_hyperparam).mean() + 0.0 * (jnp.maximum(vz_val - target_vz1, 0*vz_val)).mean()
+            vz_loss = expectile_loss(qz - vz_val, agent.cost_critic_hyperparam).mean() + 0.25 * (jnp.maximum(vz_val - target_vz1, 0*vz_val)).mean()
 
             return vz_loss, {"vz_loss": vz_loss, "vz": vz_val.mean(), "vz_max": vz_val.max(), "vz_min": vz_val.min(), "z_mean": z.mean()}
 
@@ -742,6 +741,8 @@ class DiffCBF(Agent):
                 {"params": agent.safe_value.params}, batch["observations"]
             )
 
+        scale = 0.05
+
         if agent.critic_type == "qc":
             qc = qc - agent.qc_thres
             vc = vc - agent.qc_thres
@@ -752,12 +753,12 @@ class DiffCBF(Agent):
             # unsafe_condition = jnp.where( vc >  0. - eps, 1, 0)
             # safe_condition = jnp.where(vc <= 0. - eps, 1, 0) * jnp.where(qc<=0. - eps, 1, 0)
 
-            # z_opt = agent.opt_value_func_calc_jax_batch(v, -vc, (-1100.0, 3100.0), 1000)   #SafeVelocity
+            z_opt = agent.opt_value_func_calc_jax_batch(v, -vc, (-1100.0, 3100.0), 1000)   #SafeVelocity
             # z_opt = agent.opt_value_func_calc_jax_batch(v, -vc, (-100.0, 100.0), 200)  #CarNavigation
-            z_opt = agent.opt_value_func_calc_jax_batch(v, -vc, (-10 * 4.93, 0.0), 400)    #boat
+            # z_opt = agent.opt_value_func_calc_jax_batch(v, -vc, (-10 * 4.93, 0.0), 400)    #boat
 
-            unsafe_condition = jnp.where( -vc < (v - z_opt)/100.0, 1, 0)
-            safe_condition = jnp.where(-vc >= (v - z_opt)/100.0, 1, 0) #* jnp.where(qc<=0. - eps, 1, 0)
+            unsafe_condition = jnp.where( -vc < (v - z_opt)/scale, 1, 0)
+            safe_condition = jnp.where(-vc >= (v - z_opt)/scale, 1, 0) #* jnp.where(qc<=0. - eps, 1, 0)
             
             cost_exp_adv = jnp.exp((vc-qc) * agent.cost_temperature)
             reward_exp_adv = jnp.exp((q - v) * agent.reward_temperature)
@@ -831,21 +832,21 @@ class DiffCBF(Agent):
         if self.critic_type == "qc":
             qcs = qcs - self.qc_thres
         # print("qs:", qs)
-        # z_opt = self.opt_value_func_calc_jax_batch(qs, -qcs, (-1100.0, 3100.0), 1000)   #SafeVelocity
+        z_opt = self.opt_value_func_calc_jax_batch(qs, -qcs, (-1100.0, 3100.0), 1000)   #SafeVelocity
         # z_opt = self.opt_value_func_calc_jax_batch(qs, -qcs, (-100.0, 100.0), 200)  #CarNavigation
-        z_opt = self.opt_value_func_calc_jax_batch(qs, -qcs, (-400 * 4.93, 0.0), 400)    #boat
-        scale = 100.0
+        # z_opt = self.opt_value_func_calc_jax_batch(qs, -qcs, (-400 * 4.93, 0.0), 400)    #boat
+        scale = 0.05
 
         if self.extract_method == 'safemaxq':
-            safe_indices = jnp.where(qcs < -0.15)[0]
-            if len(safe_indices) == 0:
-                idx = jnp.argmin(qcs)
-            else:
-                safe_qs = qs[safe_indices]
-                max_safe_idx = jnp.argmax(safe_qs)
-                idx = safe_indices[max_safe_idx]
-            # Vhat = jnp.minimum( -qcs , (qs - z_opt)/scale )
-            # idx = jnp.argmax(Vhat)
+            # safe_indices = jnp.where(qcs < -0.03)[0]
+            # if len(safe_indices) == 0:
+            #     idx = jnp.argmin(qcs)
+            # else:
+            #     safe_qs = qs[safe_indices]
+            #     max_safe_idx = jnp.argmax(safe_qs)
+            #     idx = safe_indices[max_safe_idx]
+            Vhat = jnp.minimum( -qcs , (qs - z_opt)/scale )
+            idx = jnp.argmax(Vhat)
         elif self.extract_method == 'maxq':
             idx = jnp.argmax(qs)
         elif self.extract_method == 'minqc':

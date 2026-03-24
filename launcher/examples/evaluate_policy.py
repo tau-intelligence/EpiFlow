@@ -45,6 +45,10 @@ def construct_env(cfg):
         env = PointRobot(id=0, seed=cfg.get('seed', 0))
         env_max_steps = env._max_episode_steps
         is_pointrobot = True
+    elif env_name == 'BoatRobot':
+        env = BoatRobot(id=0, seed=cfg.get('seed', 0))
+        env_max_steps = env._max_episode_steps
+        is_pointrobot = True  # uses evaluate_pr like PointRobot
     else:
         env = gym.make(env_name)
         env_max_steps = env._max_episode_steps
@@ -123,7 +127,7 @@ def main():
                         help='Path to the experiment results directory (contains config.json and checkpoints)')
     parser.add_argument('--checkpoint', type=str, default='latest',
                         help="Checkpoint to load. Either integer save index (e.g. 1), a filename, or 'latest'.")
-    parser.add_argument('--episodes', type=int, default=100, help='Number of evaluation episodes')
+    parser.add_argument('--episodes', type=int, default=500, help='Number of evaluation episodes')
     parser.add_argument('--render', action='store_true', help='Enable env.render() during evaluation')
     parser.add_argument('--seed', type=int, default=None, help='Seed to use for evaluation')
     parser.add_argument('--out', type=str, default=None, help='Path to save evaluation results (json)')

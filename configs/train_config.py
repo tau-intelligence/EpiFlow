@@ -34,7 +34,7 @@ def get_config(config_string):
                     cost_temperature=5,
                     reward_temperature=3,
                     T=5,
-                    N=16,
+                    N=8,
                     M=0,
                     clip_sampler=True,
                     actor_dropout_rate=0.1,

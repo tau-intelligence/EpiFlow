@@ -48,8 +48,8 @@ def evaluate_pr(
 
     episode_rets, episode_costs, episode_lens, episode_no_safes = [], [], [], []
 
-    for _ in trange(num_episodes, desc="Evaluating", leave=False):
-        obs = env.reset()
+    for ep in trange(num_episodes, desc="Evaluating", leave=False):
+        obs = env.reset(seed=ep)
         episode_ret, episode_cost, episode_len = 0.0, 0.0, 0
         while True:
             # if render:

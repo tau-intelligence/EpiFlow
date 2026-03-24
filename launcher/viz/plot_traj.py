@@ -82,7 +82,6 @@ def get_action_from_agent(agent, obs: np.ndarray):
         try:
             out = agent.sample_actions(obs)
         except Exception as e2:
-            # random fallback
             return None, agent
     # out may be (action, agent) or just action
     if isinstance(out, tuple) and len(out) >= 1:
@@ -191,12 +190,12 @@ def run_and_plot(results_dir: Path = None, checkpoint: str = 'latest', episodes:
     # load initial states CSV if provided
     init_states = None
     if init_states_csv is not None:
-        # init_states = load_init_states_from_csv(init_states_csv)
-        # init_states = init_states[:100]
-        init_states = np.array([
-            [-2.58, 0.67],
-            [-2.44, -1.16],
-        ])
+        init_states = load_init_states_from_csv(init_states_csv)
+        init_states = init_states[:100]
+        # init_states = np.array([
+        #     [-2.58, 0.67],
+        #     [-2.44, -1.16],
+        # ])
         if init_states is None:
             print("Warning: failed to load init states CSV; proceeding with normal resets.")
         else:
@@ -406,7 +405,7 @@ if __name__ == '__main__':
                         help='Path to results dir that contains config.json and modelN.pickle (optional)')
     parser.add_argument('--checkpoint', type=str, default='latest',
                         help="Checkpoint name or 'latest' (default). If name is given, tries that filename first, then model{n}.pickle.")
-    parser.add_argument('--episodes', type=int, default=2, help='Number of episodes to roll out')
+    parser.add_argument('--episodes', type=int, default=100, help='Number of episodes to roll out')
     parser.add_argument('--seed', type=int, default=None, help='Random seed (optional)')
     parser.add_argument('--out', type=str, default='all_trajectories.png', help='Path to save overlay plot')
     parser.add_argument('--per_episode_dir', type=str, default=None, help='Directory to save per-episode PNGs')
