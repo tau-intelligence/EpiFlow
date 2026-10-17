@@ -3,121 +3,280 @@
 <head>
   <meta charset="utf-8">
   <meta name="description"
-        content="EpiFlow: Bridging Safety and Performance in Offline Reinforcement Learning via Epigraph-Guided Flow Matching (NeurIPS 2026). Safe offline RL as state-constrained optimal control via an epigraph feasibility value function and flow-matching policies.">
-  <meta name="keywords" content="EpiFlow, Safe Offline RL, Epigraph, Flow Matching, State-Constrained Optimal Control, Hamilton-Jacobi, Reinforcement Learning, NeurIPS 2026">
+        content="EpiFlow (Epigraph-Guided Flow Matching) is a method for safe offline reinforcement learning. It casts safe offline RL as a state-constrained optimal control problem, learns an epigraph feasibility value function from fixed data, and extracts a one-step flow-matching policy, achieving near-zero constraint violations with competitive returns. NeurIPS 2026.">
+  <meta name="keywords" content="EpiFlow, Epigraph-Guided Flow Matching, safe reinforcement learning, safe RL, offline reinforcement learning, safe offline RL, state-constrained optimal control, epigraph, Hamilton-Jacobi-Bellman, flow matching, flow policy, flow Q-learning, Safety Gymnasium, Bullet-Safety-Gym, DSRL">
+  <meta name="robots" content="index, follow">
+  <meta name="author" content="Manan Tayal, Mumuksh Tayal, Ravi Prakash">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>EpiFlow: Bridging Safety and Performance in Offline RL via Epigraph-Guided Flow Matching | NeurIPS 2026</title>
+  <title>EpiFlow: Bridging Safety and Performance in Offline RL via Epigraph-Guided Flow Matching</title>
 
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="EpiFlow">
   <meta property="og:title" content="EpiFlow: Bridging Safety and Performance in Offline Reinforcement Learning via Epigraph-Guided Flow Matching">
-  <meta property="og:description" content="NeurIPS 2026. EpiFlow casts safe offline RL as a state-constrained optimal control problem: near-zero violations with competitive returns.">
-  <meta property="og:image" content="images/teaser.png">
+  <meta property="og:description" content="Safe offline RL as state-constrained optimal control: an epigraph feasibility value function plus a one-step flow-matching policy gives near-zero constraint violations with competitive returns. NeurIPS 2026.">
+  <meta property="og:image" content="images/framework.png">
+  <meta property="og:image:alt" content="EpiFlow framework overview diagram">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="EpiFlow: Bridging Safety and Performance in Offline Reinforcement Learning via Epigraph-Guided Flow Matching">
+  <meta name="twitter:description" content="An epigraph feasibility value function + a one-step flow-matching policy: near-zero constraint violations with competitive returns. NeurIPS 2026.">
+  <meta name="twitter:image" content="images/framework.png">
+
+  <!-- Scholarly-indexing metadata (Google Scholar / Semantic Scholar / Highwire Press tags) -->
+  <meta name="citation_title" content="Bridging Safety and Performance in Offline Reinforcement Learning via Epigraph-Guided Flow Matching">
+  <meta name="citation_author" content="Tayal, Manan">
+  <meta name="citation_author" content="Tayal, Mumuksh">
+  <meta name="citation_author" content="Prakash, Ravi">
+  <meta name="citation_publication_date" content="2026">
+  <meta name="citation_conference_title" content="Advances in Neural Information Processing Systems (NeurIPS 2026)">
+  <meta name="citation_pdf_url" content="https://arxiv.org/pdf/2602.08054">
+  <meta name="citation_arxiv_id" content="2602.08054">
 
   <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
         rel="stylesheet">
 
   <link rel="stylesheet" href="./static/css/bulma.min.css">
-  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
-  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
   <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
   <link rel="stylesheet"
         href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
   <link rel="stylesheet" href="./static/css/index.css">
+  <link rel="icon" href="./static/images/iisc_logo.png">
 
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script defer src="./static/js/fontawesome.all.min.js"></script>
-  <script src="./static/js/bulma-carousel.min.js"></script>
-  <script src="./static/js/bulma-slider.min.js"></script>
-  <script src="./static/js/index.js"></script>
   <script type="text/x-mathjax-config">
     MathJax.Hub.Config({
       jax: ["input/TeX", "output/HTML-CSS"],
       extensions: ["tex2jax.js"],
-      "HTML-CSS": { preferredFont: "TeX", availableFonts: ["STIX","TeX"], linebreaks: { automatic: true } },
+      "HTML-CSS": { preferredFont: "TeX", availableFonts: ["STIX","TeX"], scale: 95, linebreaks: { automatic: true } },
       tex2jax: { inlineMath: [ ["$", "$"], ["\\(","\\)"] ], displayMath: [ ["$$","$$"], ["\\[", "\\]"] ], processEscapes: true, ignoreClass: "tex2jax_ignore|dno" },
       TeX: { noUndefined: { attributes: { mathcolor: "red", mathbackground: "#FFEEEE", mathsize: "90%" } } },
       messageStyle: "none"
     });
   </script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js"></script>
+
+  <style>
+    body { font-family: 'Noto Sans', sans-serif; }
+    .publication-title, .title, h1, h2, h3 { font-family: 'Google Sans', sans-serif; }
+
+    /* ---- narrow, readable content column ---- */
+    .paper-body { max-width: 800px; margin: 0 auto; }
+    .paper-body p { font-size: 1.05rem; line-height: 1.7; text-align: justify; margin-bottom: 1.1em; }
+    .paper-body ul { margin-top: 0.4em; }
+    .paper-body li { font-size: 1.05rem; line-height: 1.7; margin-bottom: 0.55em; }
+
+    section.section { padding: 2.2rem 1.5rem; }
+    .section-title { font-size: 1.9rem !important; margin-bottom: 1.2rem !important; }
+    .section-title::after {
+      content: ""; display: block; width: 46px; height: 3px;
+      background: #f0a202; margin-top: 0.45rem; border-radius: 2px;
+    }
+    .subsection-title { font-size: 1.2rem !important; font-weight: 700; margin: 1.8rem 0 0.6rem 0; color: #363636; }
+
+    /* ---- header ---- */
+    .venue-badge {
+      display: inline-block; margin: 0.4rem 0 1.1rem 0; padding: 0.35em 0.9em;
+      border: 1.5px solid #f0a202; border-radius: 999px; color: #b87400;
+      font-weight: 600; font-size: 0.95rem;
+    }
+    .venue-badge a { color: inherit; }
+    .publication-links .link-block { display: inline-block; margin: 0.2rem 0.15rem; }
+
+    /* ---- TL;DR box ---- */
+    .tldr {
+      background: #fffaf0; border-left: 4px solid #f0a202;
+      border-radius: 6px; padding: 1.1rem 1.4rem 0.9rem 1.4rem; margin-bottom: 1.4rem;
+    }
+    .tldr ul { margin-left: 1.1rem; }
+    .tldr li::marker { color: #f0a202; }
+
+    /* ---- figures ---- */
+    figure.fig { margin: 1.6rem 0 1.2rem 0; }
+    figure.fig img { display: block; margin: 0 auto; max-width: 100%; height: auto; }
+    figure.fig img.narrow { max-width: 520px; width: 100%; }
+    figure.fig figcaption {
+      font-size: 0.92rem; color: #5a5a5a; line-height: 1.55;
+      margin-top: 0.85rem; text-align: justify;
+    }
+    figure.fig figcaption b { color: #363636; }
+    .fig-row { display: flex; flex-wrap: wrap; gap: 1.2rem; align-items: flex-start; }
+    .fig-row > figure.fig { flex: 1 1 260px; margin-top: 0.6rem; }
+    .fig-row > figure.fig img { max-height: 260px; width: auto; }
+
+    /* ---- theorem ---- */
+    .theorem {
+      background: #fbfbfb; border: 1px solid #e3e3e3; border-radius: 6px;
+      padding: 0.9rem 1.2rem 0.3rem 1.2rem; margin: 1.2rem 0;
+    }
+
+    /* ---- collapsible ---- */
+    details.more {
+      border: 1px solid #e3e3e3; border-radius: 6px; padding: 0.7rem 1rem;
+      margin: 1.2rem 0; background: #fbfbfb;
+    }
+    details.more > summary {
+      cursor: pointer; font-weight: 600; color: #b87400; list-style: none; outline: none;
+    }
+    details.more > summary::-webkit-details-marker { display: none; }
+    details.more > summary::before { content: "\25B8  "; }
+    details[open].more > summary::before { content: "\25BE  "; }
+    details.more[open] > summary { margin-bottom: 0.8rem; }
+
+    /* ---- result tables ---- */
+    .table-scroll { overflow-x: auto; margin: 0.6rem 0 1.4rem 0; }
+    table.results { font-size: 0.8rem; white-space: nowrap; margin: 0 auto; border-collapse: collapse; }
+    table.results th, table.results td { padding: 0.3em 0.5em; line-height: 1.25; text-align: center; border-bottom: 1px solid #eee; }
+    table.results th:first-child, table.results td:first-child { text-align: left; }
+    table.results thead th { border-bottom: 1.5px solid #dbdbdb; font-weight: 600; color: #363636; }
+    table.results .unsafe { color: #a8a8a8; }
+    table.results .ours { background: #fffaf0; }
+    table.results .std { font-size: 0.78em; opacity: 0.75; }
+    .table-caption { font-size: 0.92rem; color: #5a5a5a; line-height: 1.55; margin-bottom: 0.3rem; }
+
+    /* ---- misc ---- */
+    .hl-safe { color: #158f6f; font-weight: 600; }
+    .hl-unsafe { color: #8e2b6b; font-weight: 600; }
+    .stat-grid { display: flex; flex-wrap: wrap; gap: 1rem; margin: 1.4rem 0; }
+    .stat-card {
+      flex: 1 1 210px; background: #fff; border: 1px solid #ececec; border-radius: 8px;
+      padding: 1rem 1.1rem; text-align: center;
+    }
+    .stat-card .stat-num { font-size: 1.9rem; font-weight: 700; color: #f0a202; line-height: 1.15; font-family: 'Google Sans', sans-serif; }
+    .stat-card .stat-lbl { font-size: 0.9rem; color: #5a5a5a; margin-top: 0.3rem; line-height: 1.4; }
+
+    pre code { font-size: 0.85rem; }
+    @media screen and (max-width: 600px) {
+      .paper-body p, .paper-body li { font-size: 1rem; text-align: left; }
+      .section-title { font-size: 1.55rem !important; }
+    }
+  </style>
+
+  <!-- Structured data: paper record, so search engines can parse authors, venue, and links. -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ScholarlyArticle",
+    "headline": "Bridging Safety and Performance in Offline Reinforcement Learning via Epigraph-Guided Flow Matching",
+    "alternateName": "EpiFlow",
+    "abstract": "EpiFlow formulates safe offline reinforcement learning as a state-constrained optimal control problem. It learns an epigraph feasibility value function from fixed data through a bounded Bellman recursion and extracts a one-step flow-matching policy that maximizes return at the largest safely achievable performance level, achieving near-zero constraint violations with competitive returns on Boat Navigation, Safety-Gymnasium and Bullet-Safety-Gym.",
+    "author": [
+      { "@type": "Person", "name": "Manan Tayal", "url": "https://tayalmanan28.github.io/" },
+      { "@type": "Person", "name": "Mumuksh Tayal", "url": "https://mumukshtayal.github.io/" },
+      { "@type": "Person", "name": "Ravi Prakash", "url": "https://ravipr009.github.io/" }
+    ],
+    "datePublished": "2026",
+    "isPartOf": { "@type": "PublicationEvent", "name": "Advances in Neural Information Processing Systems (NeurIPS 2026)" },
+    "about": [
+      "Safe reinforcement learning",
+      "Offline reinforcement learning",
+      "State-constrained optimal control",
+      "Flow matching"
+    ],
+    "sameAs": [
+      "https://arxiv.org/abs/2602.08054",
+      "https://github.com/tau-intelligence/EpiFlow"
+    ],
+    "citation": "Tayal, M., Tayal, M., & Prakash, R. (2026). Bridging Safety and Performance in Offline Reinforcement Learning via Epigraph-Guided Flow Matching. Advances in Neural Information Processing Systems (NeurIPS)."
+  }
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is EpiFlow?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "EpiFlow (Epigraph-Guided Flow Matching) is a method for safe offline reinforcement learning. From a fixed dataset, it learns a policy that maximizes return while never entering a failure set, by solving a state-constrained optimal control problem through an epigraph feasibility value function and a flow-matching policy."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How is EpiFlow different from other safe offline RL methods?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Lagrangian and cost-budget methods (BCQ-Lag, BEAR-Lag, CPQ, COptiDICE, C2IQL) treat safety as a soft constraint and can violate it. HJ-reachability and CBF-based methods (FISOR, NCBF, V-OCBF) enforce safety but typically combine separately learned safety and performance values and become conservative. EpiFlow learns a single epigraph value that jointly encodes safety and the largest achievable return, so it optimizes both together."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Where was EpiFlow published?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "EpiFlow appears at the 40th Conference on Neural Information Processing Systems (NeurIPS 2026). The paper is also available on arXiv (2602.08054)."
+        }
+      }
+    ]
+  }
+  </script>
 </head>
 <body>
 
-  <!-- Header -->
+  <!-- ==================== TITLE ==================== -->
   <section class="hero">
     <div class="hero-body">
       <div class="container is-max-desktop">
         <div class="columns is-centered">
           <div class="column has-text-centered">
-            <span class="venue-badge">NeurIPS 2026</span>
-            <h1 class="title is-2 publication-title">Bridging Safety and Performance in Offline Reinforcement Learning via Epigraph-Guided Flow Matching</h1>
+            <h1 class="title is-1 publication-title" style="font-size: 2.5rem;">
+              EpiFlow
+            </h1>
+            <p class="is-size-5" style="color:#4a4a4a; margin-bottom: 1.2rem;">
+              Bridging Safety and Performance in Offline Reinforcement Learning via Epigraph-Guided Flow Matching
+            </p>
+
             <div class="is-size-5 publication-authors">
               <span class="author-block">
-                <a href="https://manantayal.com/">Manan Tayal</a><sup>1*&dagger;</sup>,
+                <a href="https://tayalmanan28.github.io/">Manan Tayal</a><sup>1*&dagger;</sup>,
               </span>
               <span class="author-block">
                 <a href="https://mumukshtayal.github.io/">Mumuksh Tayal</a><sup>2*</sup>,
               </span>
               <span class="author-block">
-                Ravi Prakash<sup>2</sup>
+                <a href="https://ravipr009.github.io/">Ravi Prakash</a><sup>2</sup>
               </span>
             </div>
 
-            <div class="is-size-5 publication-authors">
-              <span class="author-block"><sup>1</sup> Emergence AI</span>&nbsp;&nbsp;
-              <span class="author-block"><sup>2</sup> Center for Cyber-Physical Systems, Indian Institute of Science, Bengaluru</span>
-            </div>
-            <div class="author-notes">
-              <sup>*</sup>Equal contribution &nbsp;&nbsp; <sup>&dagger;</sup>Work done while at the Indian Institute of Science, Bengaluru
+            <div class="is-size-6 publication-authors" style="margin-top: 0.5rem;">
+              <span class="author-block"><sup>1</sup>Emergence AI</span>&nbsp;&nbsp;
+              <span class="author-block"><sup>2</sup>Indian Institute of Science (IISc), India</span><br>
+              <span class="author-block" style="color:#7a7a7a;"><sup>*</sup> denotes equal contribution &nbsp; <sup>&dagger;</sup> work done while at IISc</span>
             </div>
 
-            <div class="affiliation-logos">
-              <img src="static/images/iisc_logo.png" alt="Indian Institute of Science logo">
-              <img src="static/images/final_logo.png" alt="Stochastic Robotics Lab logo">
+            <div class="venue-badge">
+              40th Conference on Neural Information Processing Systems (NeurIPS), 2026
             </div>
 
-            <div class="column has-text-centered">
-              <div class="publication-links">
-                <!-- PDF Link -->
-                <span class="link-block">
-                  <a href="https://arxiv.org/pdf/2602.08054"
-                     class="external-link button is-normal is-rounded is-dark">
-                    <span class="icon">
-                        <i class="fas fa-file-pdf"></i>
-                    </span>
-                    <span>Paper</span>
-                  </a>
-                </span>
-                <!-- arXiv Link -->
-                <span class="link-block">
-                  <a href="https://arxiv.org/abs/2602.08054"
-                     class="external-link button is-normal is-rounded is-dark">
-                    <span class="icon">
-                        <i class="ai ai-arxiv"></i>
-                    </span>
-                    <span>arXiv</span>
-                  </a>
-                </span>
-                <!-- Code Link -->
-                <span class="link-block">
-                  <a href="https://github.com/tau-intelligence/EpiFlow"
-                     class="external-link button is-normal is-rounded is-dark">
-                    <span class="icon">
-                        <i class="fab fa-github"></i>
-                    </span>
-                    <span>Code</span>
-                  </a>
-                </span>
-                <!-- BibTeX Link -->
-                <span class="link-block">
-                  <a href="#BibTeX"
-                     class="external-link button is-normal is-rounded is-dark">
-                    <span class="icon">
-                        <i class="fas fa-quote-right"></i>
-                    </span>
-                    <span>BibTeX</span>
-                  </a>
-                </span>
-              </div>
+            <div class="publication-links">
+              <span class="link-block">
+                <a href="https://arxiv.org/pdf/2602.08054"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon"><i class="fas fa-file-pdf"></i></span>
+                  <span>Paper</span>
+                </a>
+              </span>
+              <span class="link-block">
+                <a href="https://arxiv.org/abs/2602.08054"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon"><i class="ai ai-arxiv"></i></span>
+                  <span>arXiv</span>
+                </a>
+              </span>
+              <span class="link-block">
+                <a href="https://github.com/tau-intelligence/EpiFlow"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon"><i class="fab fa-github"></i></span>
+                  <span>Code</span>
+                </a>
+              </span>
+              <span class="link-block">
+                <a href="#BibTeX" class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon"><i class="fas fa-quote-left"></i></span>
+                  <span>BibTeX</span>
+                </a>
+              </span>
             </div>
           </div>
         </div>
@@ -125,290 +284,441 @@
     </div>
   </section>
 
-  <!-- Teaser -->
-  <section class="hero teaser">
-    <div class="container is-max-desktop">
-      <div class="hero-body">
-        <img src="images/teaser.png" class="paper-figure is-narrow" alt="Conceptual illustration of the safety-performance trade-off in offline RL">
-        <p class="figure-caption has-text-centered">
-          <b>Safety&ndash;performance trade-off in offline RL.</b> Soft-constraint methods violate constraints, classical safety methods stay safe but follow conservative, lower-performing paths; EpiFlow achieves safety <i>and</i> high performance.
-        </p>
-        <div class="tldr">
-          <b>TL;DR</b> &mdash; <b>EpiFlow</b> (Epigraph-Guided Flow Matching) casts safe offline RL as a <b>state-constrained optimal control problem</b>, learns an <b>epigraph feasibility value function</b> from fixed data with a bounded Bellman recursion, and extracts a one-step <b>flow-matching policy</b> that maximizes return at the largest safely achievable performance level. Across Boat Navigation, Safety-Gymnasium and Bullet-Safety-Gym, it achieves <b>near-zero constraint violations</b> with competitive returns.
-        </div>
-      </div>
+  <!-- ==================== TEASER ==================== -->
+  <section class="section" style="padding-top: 0;">
+    <div class="paper-body">
+      <figure class="fig">
+        <img src="./images/framework.png" alt="EpiFlow framework overview">
+        <figcaption>
+          <b>EpiFlow in one picture.</b> From an offline dataset, EpiFlow learns an <b>epigraph feasibility
+          value function</b> $\hat V_\theta(x,z)$, which is non-negative exactly when the return threshold $z$
+          can be reached <i>and</i> the system stays safe forever. For each state it then finds the largest
+          admissible threshold $z^\star(x)$ and trains a <b>one-step flow-matching actor</b> that maximizes
+          feasibility at that budget. At deployment only the one-step actor runs &mdash; a single forward pass
+          per action.
+        </figcaption>
+      </figure>
     </div>
   </section>
 
-  <!-- Abstract -->
-  <section class="hero is-light">
-    <div class="hero-body">
-      <div class="container is-max-desktop">
-        <div class="columns is-centered has-text-centered">
-          <div class="column is-four-fifths">
-            <h2 class="title is-3 section-title">Abstract</h2>
-            <div class="content has-text-justified">
-              <p>
-                Offline reinforcement learning (RL) offers a promising framework for deploying autonomous systems in safety-critical settings without the risks of online exploration. However, learning policies that simultaneously achieve high performance and strong safety guarantees from fixed datasets remains a fundamental challenge. Many existing safe offline RL approaches typically rely on soft constraint formulations, which may permit safety violations and are sensitive to distributional shift. In contrast, formal methods such as Hamilton&ndash;Jacobi (HJ) reachability and Control Barrier Functions (CBFs) provide rigorous safety guarantees, but often yield overly conservative solutions, often neglecting performance. In this work, we bridge this gap by formulating safe offline RL as a state-constrained optimal control problem, where safety is enforced through hard state constraints and performance is captured via a reward function. The resulting value function satisfies a Hamilton&ndash;Jacobi&ndash;Bellman (HJB) equation, which we approximate using offline RL on fixed datasets by learning an epigraph feasibility value function and extracting policies via flow matching. This formulation enables principled integration of safety guarantees with data-driven policy optimization. Empirically, across safety-critical benchmarks including boat navigation, Safety-Gymnasium, and Bullet-Safety-Gym tasks, our approach achieves competitive returns while exhibiting near-zero constraint violations, demonstrating a favorable balance between safety and performance in the offline setting.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Problem Formulation -->
-  <section class="section">
-    <div class="container is-max-desktop">
-      <div class="columns is-centered">
-        <div class="column is-four-fifths">
-          <h2 class="title is-3 section-title has-text-centered">Problem: State-Constrained Optimal Control</h2>
-          <div class="content has-text-justified">
-            <p>
-              We model the environment as a state-constrained MDP with reward $r(x)$ and safety function $\ell(x)$, where the failure set is $\mathcal{F} = \{x \mid \ell(x) &lt; 0\}$. Given only an offline dataset $\mathcal{D} = \{(x_t, a_t, r_t, \ell_t, x_{t+1})\}$, we seek the maximum achievable return subject to <b>hard</b> state-wise safety:
-            </p>
-            $$V(x) = \sup_\pi \Big[\sum_{k=0}^{\infty} \gamma^k r(x_k) \,\Big|\, x_0 = x\Big] \quad \text{s.t.}\quad x_t \notin \mathcal{F}\;\; \forall t \ge 0.$$
-            <p>
-              Unlike penalty-based formulations, only policies whose trajectories <i>never</i> enter the failure set are feasible. To make this tractable, we use an <b>epigraph reformulation</b>: $V(x)$ is the largest performance threshold $z$ that remains feasible under the safety constraint,
-            </p>
-            $$V(x) = \sup\{z \in \mathbb{R} \mid \hat{V}(x,z) \ge 0\}, \qquad \hat{V}(x_t,z_t) = \sup_\pi \min\Big\{\sum_{k=t}^{\infty}\gamma^{k-t} r(x_k) - z_t,\; \min_{s\ge t}\gamma^{s-t}\ell(x_s)\Big\}.$$
-            <p>
-              The epigraph feasibility value $\hat{V}(x,z)$ is non-negative iff some policy both achieves return at least $z$ and stays safe forever. The threshold evolves as $z_{t+1} = (z_t - r(x_t))/\gamma$, so the augmented state $(x, z)$ is Markov.
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Method -->
-  <section class="hero is-light">
-    <div class="hero-body">
-      <div class="container is-max-desktop">
-        <h2 class="title is-3 section-title has-text-centered">Method: Epigraph-Guided Flow Matching (EpiFlow)</h2>
-        <img src="images/framework.png" class="paper-figure" alt="Framework overview">
-        <p class="figure-caption">
-          <b>EpiFlow framework overview.</b> From an offline dataset we learn the epigraph feasibility value function $\hat{V}_\theta(x,z)$, which, if it stays positive, keeps the system safe while maximizing reward. For each state we find the optimal performance budget $z^\star(x)$ and learn a flow-matching policy that optimizes $\hat{Q}$ at that budget, selecting the best path the offline data supports.
-        </p>
-
-        <div class="columns is-multiline" style="margin-top: 1.5rem;">
-          <div class="column is-12">
-            <div class="step-card content">
-              <h4 class="title is-5"><span class="step-num">1</span>Bounded epigraph value recursion</h4>
-              <div class="theorem-box">
-                <b>Theorem 3.1 (Bounded Epigraph Value Recursion).</b> For a deterministic SC-MDP with bounded reward and $\gamma \in (0,1)$, with $V_r$ the optimal reward value and $V_s$ the optimal safety value, the epigraph value function satisfies
-                <br><i>(i) Bellman recursion:</i>
-                $$\hat{V}(x_t, z_t) = \min\big\{\ell(x_t),\; \gamma \hat{V}(x_{t+1}, z_{t+1})\big\}$$
-                <i>(ii) Decomposition upper bound:</i>
-                $$\hat{V}(x_t, z_t) \le \min\big\{V_r(x_t) - z_t,\; V_s(x_t)\big\}$$
-              </div>
-              <p>
-                <b>Why both parts?</b> The recursion alone is structurally identical to a pure safety-value recursion, so with limited data a function approximator can collapse $\hat{V}(x,z)$ to a $z$-independent safety value $V_s(x)$. The decomposition bound injects explicit linear dependence on $z$ through $V_r(x) - z$, preventing this collapse. Part (i) pins the fixed point from below; part (ii) constrains it from above.
-              </p>
-            </div>
-          </div>
-          <div class="column is-6">
-            <div class="step-card content">
-              <h4 class="title is-5"><span class="step-num">2</span>Offline value learning</h4>
-              <p>
-                An action-conditional $\hat{Q}(x,z,a)$ is fitted on dataset transitions with target $\min\{\ell(x), \gamma \hat{V}_\theta(x', z')\}$, and distilled into $\hat{V}_\theta(x,z)$ via <b>expectile regression</b> ($\tau = 0.9$), which avoids querying out-of-distribution actions. The decomposition bound is enforced with a one-sided regularizer:
-              </p>
-              $$\mathcal{L}_{reg} = \mathbb{E}\Big[\max\big(0,\, \hat{V}_\theta(x,z) - \min\{V_r(x) - z,\, V_s(x)\}\big)\Big]$$
-              <p>giving the objective $\mathcal{L} = \mathcal{L}_{\hat{V}} + \lambda\,\mathcal{L}_{reg}$ with $\lambda = 0.25$.</p>
-            </div>
-          </div>
-          <div class="column is-6">
-            <div class="step-card content">
-              <h4 class="title is-5"><span class="step-num">3</span>Flow-matching policy synthesis</h4>
-              <p>
-                For each state, the admissible performance budget $z^\star(x) = \sup\{z \mid \hat{V}_\theta(x,z) \ge 0\}$ is found by bisection (valid since $\hat{V}$ is non-increasing in $z$). Following Flow Q-Learning, a flow behavior teacher is distilled into a <b>one-step actor</b> trained with
-              </p>
-              $$\mathcal{L}_{\text{actor}} = \mathbb{E}\big[-\hat{Q}(x, z^\star(x), \mu_\omega(x,\eta))\big] + \alpha\, \mathcal{L}_{\text{distill}}$$
-              <p>The actor maximizes feasibility at the state-wise budget and needs only a <b>single forward pass</b> per action at deployment.</p>
-            </div>
-          </div>
-        </div>
-
-        <div style="margin-top: 1.5rem;">
-          <img src="images/value_function.png" class="paper-figure" alt="Feasibility epigraph value function with and without regularization">
-          <p class="figure-caption">
-            <b>Feasibility epigraph value function $\hat{V}_\theta(x,z)$ on Boat Navigation.</b> <i>Top:</i> without the decomposition regularizer, $\hat{V}_\theta$ is nearly insensitive to $z$. <i>Bottom:</i> with the regularizer ($\lambda = 0.25$), meaningful dependence on $z$ is restored, yielding distinct level sets consistent with the epigraph formulation.
-          </p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Experiments -->
-  <section class="section">
-    <div class="container is-max-desktop">
-      <h2 class="title is-3 section-title has-text-centered">Experiments</h2>
-      <div class="content has-text-justified">
-        <p>
-          We evaluate on <b>Safe Boat Navigation</b> (2D collision avoidance under nonlinear river drift), <b>Safety-Gymnasium</b> Safe Velocity (HalfCheetah, Hopper, Ant, Walker2D, Swimmer) and Safe Car Navigation (Goal, Push, Button), and eight <b>Bullet-Safety-Gym</b> Run/Circle tasks from the DSRL benchmark. We compare against soft-constraint methods (BCQ-Lag, BEAR-Lag, CPQ, COptiDICE, C2IQL) and state-wise safety methods based on HJ reachability and CBFs (FISOR, NCBF, V-OCBF), over 500 shared initial states and multiple training seeds.
-        </p>
-      </div>
-      <img src="images/environments.jpg" class="paper-figure" alt="Evaluation environments">
-      <p class="figure-caption">
-        <b>Evaluation environments.</b> <i>Top-left:</i> Boat Navigation with obstacles and a goal. <i>Middle:</i> Safe Velocity MuJoCo tasks (red sphere denotes an unsafe state). <i>Bottom:</i> Safe Car Navigation tasks with various obstacles and objectives.
+  <!-- ==================== OVERVIEW ==================== -->
+  <section class="section" style="padding-top: 0;">
+    <div class="paper-body">
+      <h2 class="title section-title">Overview</h2>
+      <p>
+        <b>EpiFlow (Epigraph-Guided Flow Matching)</b> is a method for <b>safe offline reinforcement
+        learning</b>. It formulates the problem as <b>state-constrained optimal control</b>: safety is a hard
+        state constraint that must hold at every timestep, and performance is captured by a reward. The
+        resulting value function satisfies a Hamilton&ndash;Jacobi&ndash;Bellman equation, which EpiFlow
+        approximates from fixed data by learning an epigraph feasibility value function and extracting
+        policies via flow matching. Across Boat Navigation, Safety-Gymnasium and Bullet-Safety-Gym, it achieves
+        competitive returns with <b>near-zero constraint violations</b>.
       </p>
-
-      <div class="highlight-grid">
-        <div class="highlight-card">
-          <div class="stat">8 / 8</div>
-          <div class="label">Bullet-Safety-Gym tasks with <b>zero</b> observed violations and the highest return among zero-violation methods</div>
-        </div>
-        <div class="highlight-card">
-          <div class="stat">9 / 9</div>
-          <div class="label">Boat &amp; Safety-Gymnasium tasks where we match or exceed the best reward among safe agents</div>
-        </div>
-        <div class="highlight-card">
-          <div class="stat">1 pass</div>
-          <div class="label">One-step policy: a single forward pass per action, no rejection sampling</div>
-        </div>
-      </div>
-
-      <h3 class="title is-4 section-title" style="margin-top: 2rem;">Safety vs. performance</h3>
-      <img src="images/results.png" class="paper-figure" alt="Reward vs cost results across environments">
-      <p class="figure-caption">
-        <b>Evaluation results.</b> Points towards the left (&larr;) are safer; points towards the top (&uarr;) have higher reward. Evaluated over 500 episodes and 5 seeds (&plusmn; std). EpiFlow (&#9733;) consistently sits in the desirable top-left region: Lagrangian methods favor reward at the cost of violations, while HJ/CBF safety filters stay safe but are conservative.
-      </p>
-
-      <h3 class="title is-4 section-title" style="margin-top: 2rem;">Full results</h3>
-      <p class="content has-text-justified">
-        Normalized reward $R\uparrow$ and normalized cost $C\downarrow$ (DSRL protocol, cost limit $\kappa = 10$), mean &plusmn; std. <span style="color:#a0a0a0">Gray</span>: unsafe ($C \ge 1$). <b>Bold</b>: highest reward among safe agents. &ldquo;Ours&rdquo; denotes EpiFlow.
-      </p>
-      <div class="tabs is-centered is-boxed" id="results-tabs">
+      <div class="tldr">
         <ul>
-          <li class="is-active" data-tab="tab-gym-soft"><a>Safety-Gym vs. soft-constraint</a></li>
-          <li data-tab="tab-gym-hard"><a>Safety-Gym vs. state-wise safety</a></li>
-          <li data-tab="tab-bullet"><a>Bullet-Safety-Gym</a></li>
+          <li><b>Hard safety, not soft cost.</b> Instead of penalizing expected cumulative cost, EpiFlow solves
+              a state-constrained problem in which only policies that <i>never</i> enter the failure set are
+              feasible.</li>
+          <li><b>One value for safety and performance.</b> An epigraph reformulation folds both into a single
+              feasibility value $\hat V(x,z)$, learned with a <i>bounded</i> Bellman recursion that keeps it
+              sensitive to the return threshold $z$.</li>
+          <li><b>Fast, expressive policies.</b> A flow-matching behavior teacher is distilled into a one-step
+              actor that maximizes feasibility at the state-wise budget $z^\star(x)$, without rejection
+              sampling or iterative inference.</li>
         </ul>
       </div>
-      <div id="tab-gym-soft" class="results-table-wrapper tab-pane"></div>
-      <div id="tab-gym-hard" class="results-table-wrapper tab-pane" style="display:none"></div>
-      <div id="tab-bullet" class="results-table-wrapper tab-pane" style="display:none"></div>
-      <p class="figure-caption">
-        Safety-Gym tabs cover Boat Navigation and Safety-Gymnasium (500 evaluation episodes, 5 seeds); bold is computed across both method groups. Bullet-Safety-Gym: 500 evaluation episodes, 3 seeds. On Bullet-Safety-Gym, C2IQL attains higher return on seven of eight tasks, but at the cost of non-zero violations.
+
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-num">9 / 9</div>
+          <div class="stat-lbl">Boat &amp; Safety-Gymnasium tasks with<br>the best reward among safe agents</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">0</div>
+          <div class="stat-lbl">observed violations on all eight<br>Bullet-Safety-Gym tasks</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">1 pass</div>
+          <div class="stat-lbl">network forward pass<br>per action at deployment</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== CHALLENGE ==================== -->
+  <section class="section" style="background-color: #fafafa;">
+    <div class="paper-body">
+      <h2 class="title section-title">Challenge</h2>
+
+      <p>
+        Safe offline RL asks for a reward-maximizing policy from a fixed dataset
+        $\mathcal{D} = \{(x_t, a_t, r_t, \ell_t, x_{t+1})\}$, with no further interaction with the environment.
+        With a safety function $\ell(x)$ and failure set $\mathcal{F} = \{x : \ell(x) < 0\}$, the goal is the
+        <b>state-constrained value function</b>
+      </p>
+      $$
+      V(x) = \sup_{\pi}\ \Big[\sum_{k=0}^{\infty} \gamma^k r(x_k)\ \Big|\ x_0 = x\Big]
+      \qquad \text{s.t.}\quad x_t \notin \mathcal{F},\ \ \forall t \ge 0 .
+      $$
+      <p>
+        Only policies whose trajectories stay outside $\mathcal{F}$ at <i>every</i> timestep are feasible, and
+        two standard families of methods struggle with this for opposite reasons.
+      </p>
+
+      <figure class="fig">
+        <img src="./images/teaser.png" class="narrow" alt="Conceptual illustration of the safety-performance trade-off">
+        <figcaption>
+          <b>The safety&ndash;performance trade-off.</b> Soft-constraint methods
+          <span class="hl-unsafe">violate constraints</span>; classical safety methods stay safe but follow
+          conservative, lower-performing paths; EpiFlow reaches the goal <span class="hl-safe">safely and
+          efficiently</span>.
+        </figcaption>
+      </figure>
+
+      <p>
+        <b>Soft-constraint methods lose the guarantee.</b> Lagrangian and cost-budget approaches (BCQ-Lag,
+        BEAR-Lag, CPQ, COptiDICE, C2IQL) bound <i>expected</i> cumulative cost. That permits non-zero violation
+        risk, is sensitive to distributional shift, and becomes unstable or overly conservative when unsafe
+        transitions are rare in the data.
+      </p>
+
+      <p>
+        <b>Classical safety methods lose performance.</b> Hamilton&ndash;Jacobi reachability and control barrier
+        function approaches (FISOR, NCBF, V-OCBF) provide stronger safety, but typically act as safety filters
+        that combine separately learned safety and performance values through a switching rule, which often
+        sacrifices return. Solving the underlying HJB equation directly is intractable in high dimensions, and
+        runtime shielding or planning methods need online interaction, a dynamics model, or a verified backup
+        controller &mdash; none of which is available offline.
       </p>
     </div>
   </section>
 
-  <!-- Ablations -->
-  <section class="hero is-light">
-    <div class="hero-body">
-      <div class="container is-max-desktop">
-        <h2 class="title is-3 section-title has-text-centered">Ablations &amp; Analysis</h2>
-
-        <div class="columns">
-          <div class="column has-text-centered">
-            <img src="images/ablation_lambda.png" class="ablation-figure" alt="Effect of regularizer parameter lambda">
-            <p class="figure-caption">
-              <b>Regularizer weight $\lambda$.</b> Small $\lambda$ leaves $\hat{V}_\theta$ insensitive to $z$; large $\lambda$ drifts from the recursion objective. $\lambda = 0.25$ balances reward and cost.
-            </p>
-          </div>
-          <div class="column has-text-centered">
-            <img src="images/ablation_tau.png" class="ablation-figure" alt="Sensitivity to expectile parameter tau">
-            <p class="figure-caption">
-              <b>Expectile $\tau$.</b> $\tau = 0.5$ recovers the behavior value and is least safe; higher $\tau$ improves safety while keeping rewards competitive. We use $\tau = 0.9$ (100% safety rate on Boat).
-            </p>
-          </div>
-        </div>
-
-        <div style="margin-top: 1.5rem;">
-          <img src="images/lambda_budget.png" class="paper-figure" alt="Effect of lambda on inferred epigraph budget">
-          <p class="figure-caption">
-            <b>Effect of $\lambda$ on the inferred budget $z^\star(x)$</b> for Boat Navigation ($\lambda = 0.1, 0.25, 0.5, 1.0$, left to right). As $\lambda$ increases, the feasible region contracts and $z^\star(x)$ becomes more conservative; purple marks infeasible states.
-          </p>
-        </div>
-
-        <div class="columns" style="margin-top: 1.5rem;">
-          <div class="column is-7">
-            <img src="images/perturbation.png" class="paper-figure" alt="Robustness to action perturbations">
-            <p class="figure-caption">
-              <b>Robustness to action perturbations.</b> Under Gaussian action noise of 5%, 10% and 20% of the action bound, safety costs rise only mildly at small-to-moderate noise; reward degrades notably only under aggressive perturbation.
-            </p>
-          </div>
-          <div class="column is-5 content">
-            <p><b>Policy backbone (Boat).</b> EpiFlow is agnostic to the generative model; flow matching gives the best return.</p>
-            <table class="table is-narrow is-fullwidth results-table">
-              <thead><tr><th>Backbone</th><th>Reward</th><th>Cost</th></tr></thead>
-              <tbody>
-                <tr class="ours-col"><td><b>Flow Matching</b></td><td><b>&minus;496.23</b> <span class="std">&plusmn;0.34</span></td><td>0.0 <span class="std">&plusmn;0.0</span></td></tr>
-                <tr><td>Diffusion Model</td><td>&minus;584.53 <span class="std">&plusmn;2.37</span></td><td>0.0 <span class="std">&plusmn;0.0</span></td></tr>
-                <tr><td>Weighted BC</td><td>&minus;716.60 <span class="std">&plusmn;5.23</span></td><td>18.56 <span class="std">&plusmn;4.45</span></td></tr>
-              </tbody>
-            </table>
-            <p>
-              <b>Isolating the epigraph value.</b> Keeping the flow-matching extractor but swapping in FISOR's reachability value (FISOR-FM) lowers return on 7 of 9 tasks and raises cost on 7 of 9, while still improving on FISOR, so both components contribute.
-            </p>
-          </div>
-        </div>
-
-        <div style="margin-top: 1.5rem;">
-          <img src="images/compute_time.png" class="paper-figure" alt="Training and inference time comparison">
-          <p class="figure-caption">
-            <b>Computation time.</b> Training time (<i>left</i>) and inference time (<i>right</i>) against all baselines (&plusmn; std over 5 trials). EpiFlow stays on the low side of both, without needing extensive compute.
-          </p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Conclusion -->
+  <!-- ==================== IDEA ==================== -->
   <section class="section">
-    <div class="container is-max-desktop">
-      <div class="columns is-centered">
-        <div class="column is-four-fifths">
-          <h2 class="title is-3 section-title has-text-centered">Conclusion &amp; Limitations</h2>
-          <div class="content has-text-justified">
-            <p>
-              EpiFlow co-optimizes safety and performance in offline RL by casting state-constrained control as a tractable epigraph-based value synthesis problem: an epigraph feasibility value function is learned via a bounded Bellman recursion, and executable continuous-action policies are synthesized with flow matching while staying grounded in the offline data. The approach achieves consistently low safety violations on high-dimensional control tasks while maintaining competitive performance.
-            </p>
-            <p>
-              The learned policy is not formally verified, so guarantees remain empirical under function approximation. EpiFlow assumes deterministic dynamics; with stochastic transitions the worst-case successor needed by a robust epigraph recursion cannot be identified from a dataset that records one successor per transition. Future work will explore formal certification (e.g., Lipschitz-based verification, conformal prediction) and risk-aware extensions such as CVaR.
-            </p>
-          </div>
+    <div class="paper-body">
+      <h2 class="title section-title">Idea</h2>
+
+      <h3 class="subsection-title">1. An epigraph turns the constraint into a feasibility value</h3>
+      <p>
+        EpiFlow introduces a scalar return threshold $z$ and an auxiliary <b>epigraph feasibility value</b>
+      </p>
+      $$
+      \hat V(x_t, z_t) = \sup_\pi \min\Big\{ \sum_{k=t}^{\infty} \gamma^{k-t} r(x_k) - z_t,\ \
+      \min_{s \ge t} \gamma^{s-t} \ell(x_s) \Big\},
+      \qquad V(x) = \sup\{ z \in \mathbb{R} \mid \hat V(x, z) \ge 0 \}.
+      $$
+      <p>
+        $\hat V(x,z) \ge 0$ exactly when some policy both achieves return at least $z$ and never enters
+        $\mathcal{F}$, so the original constrained value is the largest feasible threshold. The threshold
+        evolves as $z_{t+1} = (z_t - r(x_t))/\gamma$, which keeps the augmented state $(x, z)$ Markov and lets
+        $\hat V$ be learned from offline transitions with value-based methods.
+      </p>
+
+      <h3 class="subsection-title">2. A bounded recursion that keeps $z$ in the picture</h3>
+      <div class="theorem">
+        <p>
+          <b>Theorem (Bounded Epigraph Value Recursion).</b> For a deterministic state-constrained MDP with
+          bounded reward and $\gamma \in (0,1)$, let $V_r$ be the optimal reward value and $V_s$ the optimal
+          safety value. Then the epigraph value satisfies
+        </p>
+        $$
+        \text{(i)}\ \ \hat V(x_t, z_t) = \min\big\{ \ell(x_t),\ \gamma\, \hat V(x_{t+1}, z_{t+1}) \big\},
+        \qquad
+        \text{(ii)}\ \ \hat V(x_t, z_t) \le \min\big\{ V_r(x_t) - z_t,\ V_s(x_t) \big\}.
+        $$
+      </div>
+      <p>
+        Part (i) alone is ill-conditioned offline: it is structurally identical to a pure safety-value
+        recursion, and $z$ enters only through a shifted argument. With limited data, a network can minimize
+        training error by ignoring $z$ and collapsing $\hat V(x,z)$ to $V_s(x)$. Part (ii) injects an explicit
+        linear dependence on $z$ through $V_r(x) - z$. EpiFlow enforces it with a one-sided regularizer,
+      </p>
+      $$
+      \mathcal{L}(\theta) = \mathcal{L}_{\hat V}(\theta) + \lambda\, \mathbb{E}\Big[\max\big(0,\
+      \hat V_\theta(x,z) - \min\{V_r(x) - z,\ V_s(x)\}\big)\Big],
+      $$
+      <p>
+        so the recursion pins the fixed point from below while the bound prevents collapse from above. To avoid
+        overestimating out-of-distribution actions &mdash; a safety risk here &mdash; $\hat Q(x,z,a)$ is fit on
+        dataset transitions and distilled into $\hat V_\theta$ by <b>expectile regression</b>.
+      </p>
+
+      <figure class="fig">
+        <img src="./images/value_function.png" alt="Epigraph feasibility value with and without the decomposition regularizer">
+        <figcaption>
+          <b>Why the bound matters.</b> $\hat V_\theta(x,z)$ on Boat Navigation for increasing $z$.
+          <i>Top:</i> without the regularizer, the learned value barely changes with $z$. <i>Bottom:</i> with it
+          ($\lambda = 0.25$), distinct level sets appear and the feasible region shrinks as the return threshold
+          grows, as the epigraph formulation requires.
+        </figcaption>
+      </figure>
+
+      <h3 class="subsection-title">3. A flow policy that acts at the safe budget</h3>
+      <p>
+        For each state, the maximal admissible threshold $z^\star(x) = \sup\{z \mid \hat V_\theta(x,z) \ge 0\}$
+        is found by bisection, which is valid because $\hat V$ is non-increasing in $z$. Following
+        <a href="https://seohong.me/projects/fql/">Flow Q-Learning</a>, a flow-matching behavior teacher
+        $\mu_\zeta$ is trained by conditional flow matching and distilled into a one-step actor $\mu_\omega$,
+        which is then trained with
+      </p>
+      $$
+      \mathcal{L}_{\text{actor}}(\omega) = \mathbb{E}_{x \sim \mathcal{D},\, \eta \sim \mathcal{N}(0,I)}
+      \big[-\hat Q_{\theta'}\big(x, z^\star(x), \mu_\omega(x,\eta)\big)\big] + \alpha\, \mathcal{L}_{\text{distill}}(\omega).
+      $$
+      <p>
+        Unlike FQL, the actor maximizes the <i>feasibility</i> value at the state-wise budget $z^\star(x)$
+        rather than an unconstrained reward Q-function, and because $\hat Q$ is fit in-sample, conservatism is
+        enforced at the value level rather than by the distillation term alone. The one-step actor is the only
+        component queried at deployment.
+      </p>
+
+      <details class="more">
+        <summary>Click to see the full algorithm</summary>
+        <p>
+          <b>Stage 1 &mdash; Epigraph value learning.</b> Sample minibatches $(x, a, r, \ell, x')$ from
+          $\mathcal{D}$ together with thresholds $z \sim \mathcal{U}[z_{\min}, z_{\max}]$, and set
+          $z' = (z - r(x))/\gamma$. Fit the feasibility Q-function to the target
+          $y_Q = \min\{\ell(x),\ \gamma \hat V_\theta(x', z')\}$ by squared error, and distill it into
+          $\hat V_\theta$ with the expectile loss $\mathcal{L}^\tau(u) = |\tau - \mathbf{1}(u<0)|\,u^2$ at
+          $\tau = 0.9$. In parallel, learn reward values $(Q_r, V_r)$ and safety values $(Q_s, V_s)$ with
+          IQL-style losses, and add the decomposition regularizer with $\lambda = 0.25$. Target networks are
+          updated by EMA.
+        </p>
+        <p>
+          <b>Stage 2 &mdash; Flow-matching policy synthesis.</b> For $(x, a) \sim \mathcal{D}$ and
+          $\eta \sim \mathcal{N}(0, I)$, compute $z^\star(x)$ by bisection on $\hat V_\theta(x, z) \ge 0$
+          (clamping to $z_{\min}$ when no threshold is feasible, so the policy acts to recover safety). Train the
+          flow teacher with
+          $\mathcal{L}_{\text{flow}}(\zeta) = \mathbb{E}\big[\|v_\zeta(x, \eta_t, t) - (a - \eta)\|_2^2\big]$,
+          $\eta_t = (1-t)\eta + ta$, and the one-step actor with $\mathcal{L}_{\text{actor}}$ above
+          ($\alpha = 0.1$). Return $\pi^\star(a \mid x) \leftarrow \mu_\omega(x, \eta)$.
+        </p>
+      </details>
+    </div>
+  </section>
+
+  <!-- ==================== EXPERIMENTS ==================== -->
+  <section class="section" style="background-color: #fafafa;">
+    <div class="paper-body">
+      <h2 class="title section-title">Experiments</h2>
+
+      <h3 class="subsection-title">Tasks and baselines</h3>
+      <p>
+        <b>Safe Boat Navigation</b> is a 2D collision-avoidance task in which a boat crosses a river whose drift
+        varies with the $y$-coordinate. <b>Safety-Gymnasium</b> covers the Safe Velocity suite (HalfCheetah,
+        Hopper, Ant, Walker2D, Swimmer) and Safe Car Navigation (Goal, Push, Button), and
+        <b>Bullet-Safety-Gym</b> adds eight Run and Circle tasks from the DSRL benchmark. Every method is
+        evaluated from the same 500 randomly sampled safe initial states per environment, across training
+        seeds.
+      </p>
+      <p>
+        Baselines span both families: soft-constraint methods (<b>BCQ-Lag</b>, <b>BEAR-Lag</b>, <b>CPQ</b>,
+        <b>COptiDICE</b>, <b>C2IQL</b>) and state-wise safety methods based on HJ reachability or CBFs
+        (<b>FISOR</b>, <b>NCBF</b>, <b>V-OCBF</b>).
+      </p>
+
+      <figure class="fig">
+        <img src="./images/environments.jpg" alt="Evaluation environments">
+        <figcaption>
+          <b>Evaluation environments.</b> <i>Top-left:</i> Boat Navigation with obstacles and a goal.
+          <i>Middle:</i> Safe Velocity MuJoCo tasks, where the red sphere marks an unsafe state.
+          <i>Bottom:</i> Safe Car Navigation tasks with obstacles and objectives.
+        </figcaption>
+      </figure>
+
+      <h3 class="subsection-title">Safety and reward</h3>
+      <figure class="fig">
+        <img src="./images/results.png" alt="Reward versus cost across environments for all methods">
+        <figcaption>
+          <b>Evaluation results</b> (500 episodes, 5 seeds, mean $\pm$ std). Points further left are safer;
+          points higher up earn more reward. EpiFlow (&#9733;) sits in the top-left corner across domains.
+        </figcaption>
+      </figure>
+      <p>
+        Lagrangian methods such as BEAR-Lag and BCQ-Lag frequently favor reward and incur large violations,
+        while COptiDICE, CPQ and C2IQL alternate between conservative and unsafe behavior across tasks. FISOR,
+        NCBF and V-OCBF stay safe but do so with conservative policies that limit return. EpiFlow consistently
+        attains high safety while keeping strong performance, from low-dimensional Boat Navigation to
+        high-dimensional MuJoCo and Car Navigation tasks. On Bullet-Safety-Gym it has the highest return among
+        methods with zero observed violations on every task; C2IQL earns higher return on seven of eight tasks,
+        but at the cost of non-zero violations.
+      </p>
+
+      <details class="more">
+        <summary>Click to see the full results tables</summary>
+        <p class="table-caption">
+          Normalized reward $R\uparrow$ and normalized cost $C\downarrow$ (DSRL protocol), mean $\pm$ std.
+          <span style="color:#a8a8a8">Gray</span>: unsafe ($C \ge 1$). <b>Bold</b>: highest reward among safe
+          agents across both method groups.
+        </p>
+        <p class="table-caption"><b>Boat Navigation &amp; Safety-Gymnasium &mdash; vs. soft-constraint methods</b></p>
+        <div class="table-scroll" id="table-soft"></div>
+        <p class="table-caption"><b>Boat Navigation &amp; Safety-Gymnasium &mdash; vs. state-wise safety methods</b></p>
+        <div class="table-scroll" id="table-hard"></div>
+        <p class="table-caption"><b>Bullet-Safety-Gym</b> (3 seeds; bold: highest reward overall)</p>
+        <div class="table-scroll" id="table-bullet"></div>
+      </details>
+
+      <h3 class="subsection-title">Which design choices matter?</h3>
+      <div class="fig-row">
+        <figure class="fig">
+          <img src="./images/ablation_lambda.png" alt="Effect of regularizer weight lambda">
+          <figcaption>
+            <b>Regularizer weight $\lambda$.</b> Too small leaves $\hat V_\theta$ insensitive to $z$; too large
+            drifts from the recursion. $\lambda = 0.25$ balances reward and cost.
+          </figcaption>
+        </figure>
+        <figure class="fig">
+          <img src="./images/ablation_tau.png" alt="Sensitivity to expectile parameter tau">
+          <figcaption>
+            <b>Expectile $\tau$.</b> $\tau = 0.5$ recovers the behavior value and is the least safe; $\tau = 0.9$
+            reaches a 100% safety rate on Boat Navigation.
+          </figcaption>
+        </figure>
+      </div>
+      <p>
+        Two further ablations isolate where the gains come from. Swapping the flow-matching extractor for a
+        diffusion policy keeps zero cost but lowers return, and weighted behavior cloning fails to stay safe, so
+        the framework is generative-model agnostic but benefits from flow matching. Conversely, keeping the
+        flow extractor and replacing the epigraph value with FISOR's reachability value (FISOR-FM) lowers return
+        on 7 of 9 tasks and raises cost on 7 of 9, so the epigraph formulation itself contributes.
+      </p>
+
+      <details class="more">
+        <summary>Click to see more analysis</summary>
+        <figure class="fig">
+          <img src="./images/lambda_budget.png" alt="Effect of lambda on the inferred epigraph budget">
+          <figcaption>
+            <b>Inferred budget $z^\star(x)$ on Boat Navigation</b> for $\lambda = 0.1, 0.25, 0.5, 1.0$ (left to
+            right). As $\lambda$ grows, the feasible region contracts and $z^\star(x)$ becomes more
+            conservative; purple marks infeasible states.
+          </figcaption>
+        </figure>
+        <figure class="fig">
+          <img src="./images/perturbation.png" alt="Robustness to action perturbations">
+          <figcaption>
+            <b>Robustness to action noise.</b> Reward (relative to the noise-free case) and cost under Gaussian
+            action perturbations of 5%, 10% and 20% of the action bound. Costs rise only mildly under small to
+            moderate noise; reward drops noticeably only under aggressive perturbation.
+          </figcaption>
+        </figure>
+        <p class="table-caption"><b>Policy backbone on Boat Navigation</b> (mean episode reward and cost)</p>
+        <div class="table-scroll">
+          <table class="results">
+            <thead><tr><th>Backbone</th><th>Reward</th><th>Cost</th></tr></thead>
+            <tbody>
+              <tr class="ours"><td><b>Flow Matching (EpiFlow)</b></td><td><b>&minus;496.23</b> <span class="std">&plusmn;0.34</span></td><td>0.0 <span class="std">&plusmn;0.0</span></td></tr>
+              <tr><td>Diffusion Model</td><td>&minus;584.53 <span class="std">&plusmn;2.37</span></td><td>0.0 <span class="std">&plusmn;0.0</span></td></tr>
+              <tr><td>Weighted BC</td><td>&minus;716.60 <span class="std">&plusmn;5.23</span></td><td>18.56 <span class="std">&plusmn;4.45</span></td></tr>
+            </tbody>
+          </table>
         </div>
-      </div>
+      </details>
+
+      <h3 class="subsection-title">What does it cost?</h3>
+      <figure class="fig">
+        <img src="./images/compute_time.png" alt="Training and inference time comparison">
+        <figcaption>
+          <b>Computation time</b> (mean $\pm$ std over 5 trials). Training time (<i>left</i>) and inference time
+          (<i>right</i>) against all baselines. Some baselines train for much longer and others are slow at
+          inference; EpiFlow stays on the low side of both.
+        </figcaption>
+      </figure>
+
+      <h3 class="subsection-title">Limitations</h3>
+      <p>
+        EpiFlow is not formally verified, so its safety guarantees remain empirical under function
+        approximation. It assumes deterministic dynamics: with stochastic transitions, the worst-case successor
+        required by a robust epigraph recursion cannot be identified from a dataset that records a single
+        successor per transition. Future work will explore formal certification (e.g. Lipschitz-based
+        verification and conformal prediction) and risk-aware extensions such as CVaR that account for the
+        severity, not only the occurrence, of violations.
+      </p>
     </div>
   </section>
 
-  <!-- BibTeX -->
+  <!-- ==================== FAQ ==================== -->
+  <section class="section" id="FAQ">
+    <div class="paper-body">
+      <h2 class="title section-title">Frequently Asked Questions</h2>
+
+      <h3 class="subsection-title">What is EpiFlow?</h3>
+      <p>
+        EpiFlow (Epigraph-Guided Flow Matching) is a method for safe offline reinforcement learning. From a
+        fixed dataset, it learns a policy that maximizes return while never entering a failure set, by solving
+        a state-constrained optimal control problem through an epigraph feasibility value function and a
+        flow-matching policy.
+      </p>
+
+      <h3 class="subsection-title">How is EpiFlow different from other safe offline RL methods?</h3>
+      <p>
+        Lagrangian and cost-budget methods treat safety as a soft constraint and can violate it. HJ-reachability
+        and CBF-based methods enforce safety but typically combine separately learned safety and performance
+        values and become conservative. EpiFlow learns a single epigraph value that jointly encodes safety and
+        the largest achievable return, and its policy acts at that safe budget, so safety and performance are
+        optimized together.
+      </p>
+
+      <h3 class="subsection-title">Why is the decomposition bound needed?</h3>
+      <p>
+        The epigraph Bellman recursion has the same form as a pure safety-value recursion, so with limited
+        offline data a network can ignore the threshold $z$ and collapse to a safety value. The bound
+        $\hat V(x,z) \le \min\{V_r(x) - z, V_s(x)\}$ forces explicit dependence on $z$, which is what makes the
+        safe budget $z^\star(x)$ well defined.
+      </p>
+
+      <h3 class="subsection-title">Is EpiFlow open source?</h3>
+      <p>
+        Yes. The implementation is available at
+        <a href="https://github.com/tau-intelligence/EpiFlow">github.com/tau-intelligence/EpiFlow</a>.
+      </p>
+
+      <h3 class="subsection-title">Where was EpiFlow published?</h3>
+      <p>
+        EpiFlow appears at the 40th Conference on Neural Information Processing Systems (NeurIPS 2026). The
+        paper is also available on <a href="https://arxiv.org/abs/2602.08054">arXiv</a>.
+      </p>
+    </div>
+  </section>
+
+  <!-- ==================== BIBTEX ==================== -->
   <section class="section" id="BibTeX">
-    <div class="container is-max-desktop content">
-      <h2 class="title">BibTeX</h2>
-      <div class="bibtex-wrapper">
-        <button class="button is-small copy-btn" id="copy-bibtex" type="button">
-          <span class="icon is-small"><i class="far fa-copy"></i></span><span>Copy</span>
-        </button>
-        <pre><code id="bibtex-code">@inproceedings{tayal2026epiflow,
-  title={Bridging Safety and Performance in Offline Reinforcement Learning via Epigraph-Guided Flow Matching},
-  author={Tayal, Manan and Tayal, Mumuksh and Prakash, Ravi},
-  booktitle={Advances in Neural Information Processing Systems (NeurIPS)},
-  year={2026}
+    <div class="paper-body">
+      <h2 class="title section-title">Citation</h2>
+      <pre><code>@inproceedings{tayal2026epiflow,
+    title={Bridging Safety and Performance in Offline Reinforcement Learning
+           via Epigraph-Guided Flow Matching},
+    author={Manan Tayal and Mumuksh Tayal and Ravi Prakash},
+    booktitle={Advances in Neural Information Processing Systems (NeurIPS)},
+    year={2026}
 }</code></pre>
-      </div>
     </div>
   </section>
 
-  <footer class="footer">
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="footer" style="padding: 2rem 1.5rem 3rem 1.5rem;">
     <div class="container">
       <div class="content has-text-centered">
-        <a class="icon-link" href="https://arxiv.org/pdf/2602.08054">
+        <a class="icon-link" href="https://arxiv.org/pdf/2602.08054" title="Paper">
           <i class="fas fa-file-pdf"></i>
         </a>
-        <p style="margin-top: 0.75rem;">
-          Website template adapted from <a href="https://github.com/nerfies/nerfies.github.io">Nerfies</a>.
+        <a class="icon-link" href="https://arxiv.org/abs/2602.08054" title="arXiv">
+          <i class="ai ai-arxiv"></i>
+        </a>
+        <a class="icon-link" href="https://github.com/tau-intelligence/EpiFlow" title="Code">
+          <i class="fab fa-github"></i>
+        </a>
+        <p style="font-size: 0.85rem; color: #7a7a7a; margin-top: 1rem;">
+          Website template adapted from
+          <a href="https://github.com/nerfies/nerfies.github.io">Nerfies</a>.
         </p>
       </div>
     </div>
   </footer>
 
   <script>
-    // Result tables: [mean, std] pairs per method, R then C.
-    var GYM_METHODS = ['BCQ-Lag', 'BEAR-Lag', 'CPQ', 'COptiDICE', 'C2IQL', 'FISOR', 'V-OCBF', 'NCBF', 'Ours'];
+    // Each cell is [[R mean, R std], [C mean, C std]].
+    var GYM_METHODS = ['BCQ-Lag', 'BEAR-Lag', 'CPQ', 'COptiDICE', 'C2IQL', 'FISOR', 'V-OCBF', 'NCBF', 'EpiFlow'];
     var GYM_ROWS = [
       ['Boat',        [[0.65,0.03],[1.89,0.80]], [[0.78,0.04],[1.66,0.65]], [[0.75,0.04],[7.41,0.70]], [[0.51,0.03],[1.72,0.45]], [[0.66,0.03],[2.36,0.50]], [[0.73,0.02],[0.86,0.30]], [[0.59,0.01],[0.00,0.00]], [[0.55,0.01],[0.92,0.18]], [[0.82,0.01],[0.00,0.00]]],
       ['HalfCheetah', [[1.06,0.05],[58.50,1.00]], [[0.97,0.06],[15.60,0.90]], [[0.39,0.05],[7.00,0.60]], [[0.61,0.07],[0.00,0.00]], [[1.02,0.03],[25.20,0.80]], [[0.77,0.03],[0.00,0.00]], [[0.43,0.02],[0.00,0.00]], [[0.32,0.02],[0.03,0.01]], [[0.93,0.03],[0.00,0.00]]],
@@ -420,7 +730,7 @@
       ['CarGoal1',    [[0.46,0.05],[2.98,0.40]], [[0.57,0.03],[3.38,0.25]], [[0.67,0.04],[4.18,0.30]], [[0.41,0.02],[2.04,0.15]], [[0.02,0.01],[0.06,0.05]], [[0.02,0.01],[0.02,0.01]], [[-0.01,0.00],[0.01,0.00]], [[-0.03,0.00],[0.03,0.02]], [[0.02,0.01],[0.01,0.01]]],
       ['CarPush1',    [[0.24,0.05],[1.37,0.15]], [[0.23,0.05],[1.34,0.15]], [[-0.00,0.06],[4.04,0.40]], [[0.21,0.06],[1.75,0.20]], [[0.10,0.04],[1.02,0.10]], [[0.10,0.03],[0.24,0.08]], [[0.02,0.02],[0.06,0.03]], [[-0.04,0.02],[0.28,0.05]], [[0.22,0.03],[0.06,0.03]]]
     ];
-    var BULLET_METHODS = ['COptiDICE', 'C2IQL', 'FISOR', 'V-OCBF', 'Ours'];
+    var BULLET_METHODS = ['COptiDICE', 'C2IQL', 'FISOR', 'V-OCBF', 'EpiFlow'];
     var BULLET_ROWS = [
       ['Ant-Run',      [[0.51,0.01],[0.03,0.01]], [[0.67,0.01],[0.11,0.01]], [[0.16,0.03],[0.00,0.00]], [[0.15,0.03],[0.00,0.00]], [[0.33,0.01],[0.00,0.00]]],
       ['Ball-Run',     [[0.42,0.08],[0.15,0.03]], [[0.53,0.05],[0.11,0.01]], [[0.22,0.01],[0.00,0.00]], [[0.20,0.01],[0.00,0.00]], [[0.33,0.01],[0.00,0.00]]],
@@ -436,67 +746,46 @@
       return (v < 0 || Object.is(v, -0) ? '&minus;' : '') + Math.abs(v).toFixed(2);
     }
 
-    // Bold marks the highest reward among safe agents (C < 1), as in the paper.
-    // For Bullet-Safety-Gym the paper bolds the highest reward overall instead.
-    // `show` lists the method columns to render; bolding still considers every method.
-    function buildTable(methods, rows, boldRule, show) {
-      show = show || methods;
-      var html = '<table class="table is-narrow is-hoverable results-table"><thead><tr><th rowspan="2">Task</th>';
+    // `show` lists the columns to render; the bold winner is chosen across all methods.
+    function buildTable(methods, rows, eligible, show) {
+      var html = '<table class="results"><thead><tr><th rowspan="2">Task</th>';
       show.forEach(function (m) {
-        var cls = m === 'Ours' ? ' ours-col' : '';
-        html += '<th colspan="2" class="group' + cls + '">' + (m === 'Ours' ? '<b>EpiFlow (Ours)</b>' : m) + '</th>';
+        html += '<th colspan="2"' + (m === 'EpiFlow' ? ' class="ours"' : '') + '>' + m + '</th>';
       });
       html += '</tr><tr>';
       show.forEach(function (m) {
-        var cls = m === 'Ours' ? ' class="ours-col"' : '';
+        var cls = m === 'EpiFlow' ? ' class="ours"' : '';
         html += '<th' + cls + '>R&uarr;</th><th' + cls + '>C&darr;</th>';
       });
       html += '</tr></thead><tbody>';
       rows.forEach(function (row) {
         var cells = row.slice(1);
         var best = -Infinity;
-        cells.forEach(function (c) {
-          if (boldRule(c)) best = Math.max(best, c[0][0]);
-        });
+        cells.forEach(function (c) { if (eligible(c)) best = Math.max(best, c[0][0]); });
         html += '<tr><td>' + row[0] + '</td>';
         cells.forEach(function (c, i) {
           if (show.indexOf(methods[i]) < 0) return;
-          var unsafe = c[1][0] >= 1;
           var cls = [];
-          if (unsafe) cls.push('unsafe');
-          if (methods[i] === 'Ours') cls.push('ours-col');
+          if (c[1][0] >= 1) cls.push('unsafe');
+          if (methods[i] === 'EpiFlow') cls.push('ours');
           var attr = cls.length ? ' class="' + cls.join(' ') + '"' : '';
           var r = fmt(c[0][0]);
-          if (boldRule(c) && c[0][0] === best) r = '<b>' + r + '</b>';
-          html += '<td' + attr + '>' + r + ' <span class="std">&plusmn;' + c[0][1].toFixed(2) + '</span></td>';
-          html += '<td' + attr + '>' + fmt(c[1][0]) + ' <span class="std">&plusmn;' + c[1][1].toFixed(2) + '</span></td>';
+          if (eligible(c) && c[0][0] === best) r = '<b>' + r + '</b>';
+          html += '<td' + attr + '>' + r + '<br><span class="std">&plusmn;' + c[0][1].toFixed(2) + '</span></td>';
+          html += '<td' + attr + '>' + fmt(c[1][0]) + '<br><span class="std">&plusmn;' + c[1][1].toFixed(2) + '</span></td>';
         });
         html += '</tr>';
       });
       return html + '</tbody></table>';
     }
 
-    $(function () {
-      var safeOnly = function (c) { return c[1][0] < 1; };
-      $('#tab-gym-soft').html(buildTable(GYM_METHODS, GYM_ROWS, safeOnly, ['BCQ-Lag', 'BEAR-Lag', 'CPQ', 'COptiDICE', 'C2IQL', 'Ours']));
-      $('#tab-gym-hard').html(buildTable(GYM_METHODS, GYM_ROWS, safeOnly, ['FISOR', 'V-OCBF', 'NCBF', 'Ours']));
-      $('#tab-bullet').html(buildTable(BULLET_METHODS, BULLET_ROWS, function () { return true; }));
-
-      $('#results-tabs li').on('click', function () {
-        $('#results-tabs li').removeClass('is-active');
-        $(this).addClass('is-active');
-        $('.tab-pane').hide();
-        $('#' + $(this).data('tab')).show();
-      });
-
-      $('#copy-bibtex').on('click', function () {
-        var btn = $(this);
-        navigator.clipboard.writeText($('#bibtex-code').text()).then(function () {
-          btn.find('span:last').text('Copied!');
-          setTimeout(function () { btn.find('span:last').text('Copy'); }, 1500);
-        });
-      });
-    });
+    var safeOnly = function (c) { return c[1][0] < 1; };
+    document.getElementById('table-soft').innerHTML =
+      buildTable(GYM_METHODS, GYM_ROWS, safeOnly, ['BCQ-Lag', 'BEAR-Lag', 'CPQ', 'COptiDICE', 'C2IQL', 'EpiFlow']);
+    document.getElementById('table-hard').innerHTML =
+      buildTable(GYM_METHODS, GYM_ROWS, safeOnly, ['FISOR', 'V-OCBF', 'NCBF', 'EpiFlow']);
+    document.getElementById('table-bullet').innerHTML =
+      buildTable(BULLET_METHODS, BULLET_ROWS, function () { return true; }, BULLET_METHODS);
   </script>
 
 </body>
