@@ -155,3 +155,142 @@ body {
 #interpolation-image-wrapper img {
   border-radius: 5px;
 }
+
+/* ---- NeurIPS 2026 page additions ---- */
+:root {
+  --accent: #3a5bd9;
+  --accent-soft: #eef2ff;
+  --ours: #e8890c;
+  --muted: #6b7280;
+}
+
+.venue-badge {
+  display: inline-block;
+  margin-bottom: 1.1rem;
+  padding: 0.35rem 1rem;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #3a5bd9, #7c3aed);
+  color: #fff;
+  font-family: 'Google Sans', sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  font-size: 0.95rem;
+}
+
+.author-notes {
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin-top: 0.4rem;
+}
+
+.affiliation-logos {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  margin-top: 1rem;
+}
+.affiliation-logos img { height: 52px; width: auto; }
+
+.tldr {
+  background: var(--accent-soft);
+  border-left: 4px solid var(--accent);
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  margin-top: 1.25rem;
+  text-align: left;
+}
+
+.section-title {
+  font-family: 'Google Sans', sans-serif;
+}
+
+.figure-caption {
+  font-size: 0.95rem;
+  color: #4a4a4a;
+  text-align: justify;
+  padding-top: 0.75rem;
+}
+
+.paper-figure {
+  width: 100%;
+  border-radius: 8px;
+  background: #fff;
+}
+.paper-figure.is-narrow { max-width: 640px; margin: 0 auto; display: block; }
+
+.theorem-box {
+  background: #f7f7f9;
+  border: 1px solid #dcdce4;
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  margin: 1rem 0;
+}
+
+.highlight-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+.highlight-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 1rem;
+  text-align: center;
+  background: #fff;
+}
+.highlight-card .stat {
+  font-family: 'Google Sans', sans-serif;
+  font-size: 1.9rem;
+  font-weight: 700;
+  color: var(--accent);
+  line-height: 1.2;
+}
+.highlight-card .label { font-size: 0.9rem; color: #4a4a4a; }
+
+.step-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  height: 100%;
+  background: #fff;
+}
+.step-card .step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.8rem;
+  height: 1.8rem;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 700;
+  margin-right: 0.5rem;
+}
+
+.results-table-wrapper { overflow-x: auto; }
+.results-table {
+  font-size: 0.8rem;
+  white-space: nowrap;
+  margin: 0 auto;
+}
+.results-table th, .results-table td { text-align: center !important; vertical-align: middle; }
+.results-table td:first-child, .results-table th:first-child { text-align: left !important; }
+.results-table .unsafe { color: #a0a0a0; }
+.results-table .best { font-weight: 700; }
+.results-table .ours-col { background: #fff7ec; }
+.results-table .std { font-size: 0.75em; color: inherit; opacity: 0.8; }
+.results-table thead th.group { border-bottom: 2px solid #dbdbdb; }
+
+.tabs li.is-active a { color: var(--accent); border-bottom-color: var(--accent); }
+
+.bibtex-wrapper { position: relative; }
+.bibtex-wrapper .copy-btn {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
+}
+
+.ablation-figure { max-height: 260px; width: auto; max-width: 100%; }
+.results-table td, .results-table th { padding: 0.3em 0.4em !important; }
