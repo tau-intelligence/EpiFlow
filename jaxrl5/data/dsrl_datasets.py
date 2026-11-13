@@ -4,23 +4,51 @@ import dsrl
 import numpy as np
 from jaxrl5.data.dataset import Dataset
 import h5py
+from huggingface_hub import hf_hub_download
+
+HF_DATASET_REPO = "tayalmanan/SafeBoatData"
+
+
+def _ensure_local_dataset(data_location):
+    if os.path.exists(data_location):
+        return data_location
+
+    filename = os.path.basename(data_location)
+    local_dir = os.path.dirname(data_location) or "data"
+    os.makedirs(local_dir, exist_ok=True)
+    print(f"'{data_location}' not found locally, downloading '{filename}' from "
+          f"huggingface.co/datasets/{HF_DATASET_REPO} ...")
+    return hf_hub_download(
+        repo_id=HF_DATASET_REPO,
+        filename=filename,
+        repo_type="dataset",
+        local_dir=local_dir,
+    )
 
 
 class DSRLDataset(Dataset):
     def __init__(self, env: gym.Env, clip_to_eps: bool = True, eps: float = 1e-5, critic_type="qc", data_location=None, cost_scale=1., ratio = 1.0):
 
         if data_location is not None:
-            # Point Robot
+            # Point Robot and Boat Robot
             dataset_dict = {}
             print('=========Data loading=========')
+            data_location = _ensure_local_dataset(data_location)
             print('Load point robot data from:', data_location)
             f = h5py.File(data_location, 'r')
             dataset_dict["observations"] = np.array(f['state'])
             dataset_dict["actions"] = np.array(f['action'])
             dataset_dict["next_observations"] = np.array(f['next_state'])
             dataset_dict["rewards"] = np.array(f['reward'])
-            dataset_dict["dones"] = np.array(f['done'])
-            dataset_dict['costs'] = -1.0 * np.array(f['h'])
+            dataset_dict["dones"] = np.array(f['done']).astype(bool)
+            if 'episode' in f:
+                # Mark the last transition of every episode (time limits included) as
+                # terminal, so the discounted safety / epigraph values are bounded.
+                episode = np.array(f['episode'])
+                episode_end = np.append(episode[1:] != episode[:-1], True)
+                dataset_dict["dones"] = np.logical_or(dataset_dict["dones"], episode_end)
+            dataset_dict['costs'] = -np.array(f['h'])
+            # dataset_dict['costs'] = np.where(dataset_dict['costs']>0, 1 * cost_scale, -1)    # 25 if cost > 0 else -1
 
             violation = np.array(f['cost'])
             print('env_max_episode_steps', env._max_episode_steps)

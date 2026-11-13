@@ -7,7 +7,7 @@ default_init = nn.initializers.xavier_uniform
 
 def get_weight_decay_mask(params):
     flattened_params = flax.traverse_util.flatten_dict(
-        flax.core.frozen_dict.unfreeze(params))
+        flax.core.frozen_dict.unfreeze(params) if isinstance(params, flax.core.frozen_dict.FrozenDict) else params)
 
     def decay(k, v):
         if any([(key == 'bias' or 'Input' in key or 'Output' in key)
@@ -16,10 +16,12 @@ def get_weight_decay_mask(params):
         else:
             return True
 
-    return flax.core.frozen_dict.freeze(
-        flax.traverse_util.unflatten_dict(
+    mask = flax.traverse_util.unflatten_dict(
             {k: decay(k, v)
-             for k, v in flattened_params.items()}))
+             for k, v in flattened_params.items()})
+    if isinstance(params, flax.core.frozen_dict.FrozenDict):
+        return flax.core.frozen_dict.freeze(mask)
+    return mask
 
 class MLP(nn.Module):
     hidden_dims: Sequence[int]

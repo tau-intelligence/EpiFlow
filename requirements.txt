@@ -1,11 +1,22 @@
-numpy >= 1.20.2
-jax == 0.4.9
-flax == 0.5.3
-ml_collections >= 0.1.0
-tqdm >= 4.60.0
-optax == 0.1.5
-absl-py >= 0.12.0
-scipy >= 1.6.0
-wandb >= 0.12.14
-dsrl
-matplotlib
+# Tested with Python 3.9 and CUDA 12 (see environment.yml for the full pinned environment).
+jax[cuda12]==0.4.30
+flax==0.8.2
+optax==0.2.1
+ml-collections==0.1.1
+absl-py==2.3.1
+numpy==2.0.2
+scipy==1.13.1
+h5py==3.14.0
+tqdm==4.67.1
+matplotlib==3.9.4
+pandas
+pyyaml==6.0.2
+wandb==0.21.1
+huggingface_hub
+# environments and offline datasets
+gymnasium==0.28.1
+gym==0.26.2
+mujoco==2.3.0
+safety-gymnasium==0.4.0
+bullet-safety-gym==1.4.0
+dsrl==0.1.0

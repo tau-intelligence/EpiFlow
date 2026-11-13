@@ -29,17 +29,14 @@ class Relu_StateValue(nn.Module):
         return jnp.squeeze(value, -1)
 
 
+
 class StateValueWithZ(nn.Module):
-    """State Value function that takes observations and an additional input z."""
+    """Epigraph value V_hat(x, z): the epigraph variable z is concatenated to x."""
     base_cls: nn.Module
 
     @nn.compact
     def __call__(self, observations: jnp.ndarray, z: jnp.ndarray, *args, **kwargs) -> jnp.ndarray:
-        # Concatenate observations with z along the last axis
         inputs = jnp.concatenate([observations, z], axis=-1)
         outputs = self.base_cls()(inputs, *args, **kwargs)
-
         value = nn.Dense(1, kernel_init=default_init(), name="OutputVDense")(outputs)
-
         return jnp.squeeze(value, -1)
-

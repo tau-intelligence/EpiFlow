@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# experiment outputs
+results/
+wandb/
+logs/
+plots/figures/
+
+# sub-sampled DSRL datasets created for the data-quantity study
+data/*-[0-9]*-0.*.hdf5
+
+# editors
+.vscode/
+.idea/
+.claude/

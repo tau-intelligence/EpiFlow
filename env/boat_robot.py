@@ -13,7 +13,7 @@ class BoatRobot(gym.Env):
             dtype=np.float32
         )
         self.action_space = gym.spaces.Box(low=-1, high=1, shape=(2,), dtype=np.float32)
-        self.hazard_position_list = [np.array([-0.5, 0.5, 0.4]), np.array([-1.0, -1.2, 0.4])]
+        self.hazard_position_list = [np.array([-0.5, 0.5, 0.4]), np.array([-1.0, -1.2, 0.5])]
         self.goal_position = np.array([1.5, 0.0])
         self.goal_size = 0.005
         self.dt = 0.005
@@ -40,8 +40,6 @@ class BoatRobot(gym.Env):
         return self._get_obs()
 
     def step(self, action: np.ndarray) -> Tuple[np.ndarray, float, bool, dict]:
-        # action_noise = np.random.normal(0, 0.2, size=action.shape)     #[0.05, 0.1, 0.2]
-        # action = action + action_noise
         action_norm = np.linalg.norm(action)
         action = action / (action_norm + 1e-8)
 
@@ -81,13 +79,14 @@ class BoatRobot(gym.Env):
         min_dist = float('inf')
         for hazard_pos in self.hazard_position_list:
             hazard_vec = hazard_pos[:2] - state[:2]
+            # print("Hazard vec:", hazard_vec)
             dist = np.linalg.norm(hazard_vec) - hazard_pos[2]
             min_dist = min(dist, min_dist)
         con_val = - min_dist
         info = dict(
-            cost=int(con_val>=0),
+            cost=int(con_val>0),
             constraint_value=con_val,
-            violation=(con_val>=0).item()
+            violation=(con_val>0).item()
         )
         assert np.isclose(info['constraint_value'], self.get_constraint_values(state), atol=1e-4)
         assert info['violation'] == self.check_violation(state)
@@ -103,7 +102,7 @@ class BoatRobot(gym.Env):
         min_dist = np.full(states.shape[0], float('inf'))
         for hazard_pos in self.hazard_position_list:
             hazard_vec = hazard_pos[:2] - states[:, :2]
-            dist = np.linalg.norm(hazard_vec) - hazard_pos[2]
+            dist = np.linalg.norm(hazard_vec, axis=1) - hazard_pos[2]
             min_dist = np.minimum(dist, min_dist)
         return - np.squeeze(min_dist)
     
@@ -112,7 +111,7 @@ class BoatRobot(gym.Env):
                 states = states[np.newaxis, ...]
         assert len(states.shape) >= 2
 
-        return self.get_constraint_values(states) >= 0
+        return self.get_constraint_values(states) > 0
 
     # def check_done(self, states):
     #     if len(states.shape) == 1:
@@ -215,12 +214,16 @@ class BoatRobot(gym.Env):
 
 
         for hazard_position in self.hazard_position_list:
-            circle = Circle((hazard_position[0], hazard_position[1]), self.hazard_size, fill=True, alpha=0.5, color=(0.30,0.52,0.74))
+            circle = Circle(
+                (hazard_position[0], hazard_position[1]),
+                hazard_position[2],
+                fill=True,
+                alpha=0.5,
+                color='red',
+            )
             ax.add_patch(circle)
         # Goal
-        circle = Circle((self.goal_position[0], self.goal_position[1]), self.goal_size, fill=True, alpha=0.5, color=(0.35,0.66,0.35))
-        ax.add_patch(circle)
-        circle = Circle((-2.7, -2.7), 0.1, fill=True, alpha=0.5, color='r')
+        circle = Circle((self.goal_position[0], self.goal_position[1]), 0.01, fill=True, alpha=0.7, color='green')
         ax.add_patch(circle)
         ax.set_xlim([-3,3])
         ax.set_ylim([-3,3])
@@ -229,11 +232,13 @@ class BoatRobot(gym.Env):
     def _get_single_avoidable(self, state):
         x, y, v, theta = state
         hazard_position = self.hazard_position_list[1]
+        hazard_center = hazard_position[:2]
+        hazard_radius = hazard_position[2]
 
-        hazard_vec = hazard_position - np.array([x, y])
+        hazard_vec = hazard_center - np.array([x, y])
 
         dist = np.linalg.norm(hazard_vec)
-        if dist <= self.hazard_size:
+        if dist <= hazard_radius:
             return False
 
 
@@ -242,7 +247,7 @@ class BoatRobot(gym.Env):
         velocity = np.clip(velocity, 1e-6, None)
         cos_theta = np.dot(velocity_vec, hazard_vec) / (velocity * dist)
         sin_theta = np.sqrt(1 - cos_theta ** 2)
-        delta = self.hazard_size ** 2 - (dist * sin_theta) ** 2
+        delta = hazard_radius ** 2 - (dist * sin_theta) ** 2
         if cos_theta <= 0 or delta < 0:
             return True
 
@@ -255,8 +260,8 @@ class BoatRobot(gym.Env):
         s = np.copy(state)
         while s[2] > 0:
             s = s + self._dynamics(s, action) * self.dt
-            dist = np.linalg.norm([hazard_position[0]-s[0], hazard_position[1]-s[1]])
-            if dist <= self.hazard_size:
+            dist = np.linalg.norm([hazard_center[0] - s[0], hazard_center[1] - s[1]])
+            if dist <= hazard_radius:
                 return False
             
         return True

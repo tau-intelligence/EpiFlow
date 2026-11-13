@@ -1,2 +1,1 @@
-from jaxrl5.agents.diffcbf.diffcbf import DiffCBF
-
+from jaxrl5.agents.epiflow import EpiFlow
