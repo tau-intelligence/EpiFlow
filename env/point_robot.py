@@ -29,13 +29,13 @@ class PointRobot(gym.Env):
     
     def reset(self,state=None) -> np.ndarray:
         self.state = np.random.uniform(low=[-3.0, -3.0, 0.5, np.pi / 4], high=[3.0, 3.0, 2.0, 3 * np.pi / 4])
-        # if self.id is not None:
-        #     if state is None:
-        #         self.state = np.array([-1.8, 0.0, 2.0, np.pi/4], dtype=np.float32) # feasible no violation, near 
-        #         # self.state = np.array([-1.5, 0.0, 2.0, np.pi/4], dtype=np.float32) # infeasible , can find safest policy
-        #         # self.state = np.array([-2.7, -2.7, 2.0, np.pi/2], dtype=np.float32)
-        #     else:
-        #         self.state=state
+        if self.id is not None:
+            if state is None:
+                self.state = np.array([-1.8, 0.0, 2.0, np.pi/4], dtype=np.float32) # feasible no violation, near 
+                # self.state = np.array([-1.5, 0.0, 2.0, np.pi/4], dtype=np.float32) # infeasible , can find safest policy
+                # self.state = np.array([-2.7, -2.7, 2.0, np.pi/2], dtype=np.float32)
+            else:
+                self.state=state
         self.last_dist = np.linalg.norm([self.state[0]-self.goal_position[0], self.state[1]-self.goal_position[1]])
         return self._get_obs()
 

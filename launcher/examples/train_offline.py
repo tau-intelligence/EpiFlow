@@ -5,26 +5,26 @@ import random
 import numpy as np
 from absl import app, flags
 import datetime
-import yaml
 from ml_collections import config_flags, ConfigDict
-# import wandb
 from tqdm.auto import trange  # noqa
 import gymnasium as gym
 from env.env_list import env_list
 from env.point_robot import PointRobot
 from env.boat_robot import BoatRobot
 from jaxrl5.wrappers import wrap_gym
-from jaxrl5.agents import DiffCBF
+from jaxrl5.agents import EpiFlow
 from jaxrl5.data.dsrl_datasets import DSRLDataset
-from jaxrl5.evaluation import evaluate, evaluate_pr
+from jaxrl5.evaluation import evaluate, evaluate_pr, evaluate_br
 import json
 
 
 FLAGS = flags.FLAGS
-flags.DEFINE_integer('env_id', 31, 'Choose env')
+flags.DEFINE_integer('env_id', 30, 'Choose env')
 flags.DEFINE_float('ratio', 1.0, 'dataset ratio')
 flags.DEFINE_string('project', '', 'project name for wandb')
 flags.DEFINE_string('experiment_name', '', 'experiment name for wandb')
+flags.DEFINE_float('alpha', -1.0, 'Override alpha (-1 = use config default)')
+flags.DEFINE_float('reg_weight', -1.0, 'Override lambda (-1 = use config default)')
 config_flags.DEFINE_config_file(
     "config",
     None,
@@ -38,9 +38,19 @@ def to_dict(config):
     return config
 
 
+def resolve_z_range(agent_kwargs, ds):
+    """Dataset-supported interval [z_min, z_max] for the epigraph variable z."""
+    r = ds.dataset_dict['rewards']
+    horizon = 1.0 / (1.0 - agent_kwargs.get('discount', 0.99))
+    if agent_kwargs.get('z_min') is None:
+        agent_kwargs['z_min'] = float(r.min() * horizon)
+    if agent_kwargs.get('z_max') is None:
+        agent_kwargs['z_max'] = float(r.max() * horizon)
+    print(f"Epigraph variable range: z in [{agent_kwargs['z_min']:.3f}, {agent_kwargs['z_max']:.3f}]")
+
+
 def call_main(details):
     details['agent_kwargs']['cost_scale'] = details['dataset_kwargs']['cost_scale']
-    # wandb.init(project=details['project'], name=details['experiment_name'], group=details['group'], config=details['agent_kwargs'])
 
     if details['env_name'] == 'PointRobot':
         assert details['dataset_kwargs']['pr_data'] is not None, "No data for Point Robot"
@@ -62,40 +72,41 @@ def call_main(details):
 
     config_dict = dict(details['agent_kwargs'])
     config_dict['env_max_steps'] = env_max_steps
+    resolve_z_range(config_dict, ds)
+    details['agent_kwargs']['z_min'] = config_dict['z_min']
+    details['agent_kwargs']['z_max'] = config_dict['z_max']
 
-    model_cls = config_dict.pop("model_cls")    #DiffCBF
+    out_dir = f"./results/{details['group']}/{details['experiment_name']}"
+    with open(f"{out_dir}/config.json", "w") as f:
+        json.dump(to_dict(details), f, indent=4)
+
+    model_cls = config_dict.pop("model_cls")
     config_dict.pop("cost_scale")
     agent = globals()[model_cls].create(
         details['seed'], env.observation_space, env.action_space, **config_dict
     )
 
-
     save_time = 1
     for i in trange(details['max_steps'], smoothing=0.1, desc=details['experiment_name']):
         sample = ds.sample_jax(details['batch_size'])
         agent, info = agent.update(sample)
-        
-        # Print losses at regular intervals
-        if i % details['log_interval'] == 0:
-            print(f"\nStep {i}: vz1_loss={info.get('vz1_loss', 'N/A'):.6f}, qz1_loss={info.get('qz1_critic_loss', 'N/A'):.6f}, "
-                  f"vz_loss={info.get('vz_loss', 'N/A'):.6f}, qz_loss={info.get('qz_critic_loss', 'N/A'):.6f}, "
-                  f"value_loss={info.get('value_loss', 'N/A'):.6f}, safe_value_loss={info.get('safe_value_loss', 'N/A'):.6f}")
-            # wandb.log({f"train/{k}": v for k, v in info.items()}, step=i)
 
-        # if i % details['eval_interval'] == 0 and i > 0:
+        if i % details['log_interval'] == 0:
+            print({f"train/{k}": v for k, v in info.items()})
+
         if i % details['eval_interval'] == 0:
-            agent.save(f"./results/{details['group']}/{details['experiment_name']}", save_time)
+            agent.save(out_dir, save_time)
             save_time += 1
             if details['env_name'] == 'PointRobot':
                 eval_info = evaluate_pr(agent, env, details['eval_episodes'])
             elif details['env_name'] == 'BoatRobot':
-                eval_info = evaluate_pr(agent, env, details['eval_episodes'])
+                eval_info = evaluate_br(agent, env, details['eval_episodes'])
             else:
-                eval_info = evaluate(agent, env, details['eval_episodes'], render=False)
-            # if details['env_name'] != 'PointRobot':
-            #     eval_info["normalized_return"], eval_info["normalized_cost"] = env.get_normalized_score(eval_info["return"], eval_info["cost"])
-            # elif details['env_name'] == 'BoatRobot':
-            #     eval_info["normalized_return"], eval_info["normalized_cost"] = env.get_normalized_score(eval_info["return"], eval_info["cost"])
+                eval_info = evaluate(agent, env, details['eval_episodes'])
+            print({f"eval/{k}": v for k, v in eval_info.items()})
+
+    agent.save(out_dir, "_final")
+
 
 def main(_):
     parameters = FLAGS.config
@@ -105,37 +116,35 @@ def main(_):
     parameters['ratio'] = FLAGS.ratio
     parameters['group'] = parameters['env_name']
 
-    parameters['experiment_name'] = parameters['agent_kwargs']['sampling_method'] + '_' \
-                                + parameters['agent_kwargs']['actor_objective'] + '_' \
-                                + parameters['agent_kwargs']['critic_type'] + '_N' \
-                                + str(parameters['agent_kwargs']['N']) + '_' \
-                                + parameters['agent_kwargs']['extract_method'] if FLAGS.experiment_name == '' else FLAGS.experiment_name
+    if FLAGS.experiment_name == '':
+        parameters['experiment_name'] = parameters['agent_kwargs']['model_cls']
+    else:
+        parameters['experiment_name'] = FLAGS.experiment_name
     parameters['experiment_name'] += '_' + str(datetime.date.today()) + '_s' + str(parameters['seed']) + '_' + str(random.randint(0,1000))
 
-    if parameters['env_name'] == 'PointRobot':
-        parameters['max_steps'] = 100001
-        parameters['batch_size'] = 1024
-        parameters['eval_interval'] = 2500000
-        parameters['agent_kwargs']['cost_temperature'] = 2
-        parameters['agent_kwargs']['reward_temperature'] = 5
-        parameters['agent_kwargs']['cost_ub'] = 150
-        parameters['agent_kwargs']['N'] = 8
-    elif parameters['env_name'] == 'BoatRobot':
+    if parameters['env_name'] == 'PointRobot' or parameters['env_name'] == 'BoatRobot':
         parameters['max_steps'] = 100001
         parameters['batch_size'] = 1024
         parameters['eval_interval'] = 25000
-        parameters['agent_kwargs']['cost_temperature'] = 2
-        parameters['agent_kwargs']['reward_temperature'] = 5
-        parameters['agent_kwargs']['cost_ub'] = 150
-        parameters['agent_kwargs']['N'] = 8    
+
+    _max_steps_override = os.environ.get('EPIFLOW_MAX_STEPS')
+    if _max_steps_override:
+        parameters['max_steps'] = int(_max_steps_override)
+        print(f"[override] max_steps -> {parameters['max_steps']}")
+
+    if FLAGS.alpha >= 0:
+        parameters['agent_kwargs']['alpha'] = FLAGS.alpha
+        print(f"[override] alpha -> {FLAGS.alpha}")
+
+    if FLAGS.reg_weight >= 0:
+        parameters['agent_kwargs']['reg_weight'] = FLAGS.reg_weight
+        print(f"[override] reg_weight -> {FLAGS.reg_weight}")
 
     print(parameters)
 
     if not os.path.exists(f"./results/{parameters['group']}/{parameters['experiment_name']}"):
         os.makedirs(f"./results/{parameters['group']}/{parameters['experiment_name']}")
-    with open(f"./results/{parameters['group']}/{parameters['experiment_name']}/config.json", "w") as f:
-        json.dump(to_dict(parameters), f, indent=4)
-    
+
     call_main(parameters)
 
 

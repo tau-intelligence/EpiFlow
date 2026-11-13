@@ -36,17 +36,14 @@ class Relu_StateActionValue(nn.Module):
 
 
 class StateActionValueWithZ(nn.Module):
-    """State-Action Value function with auxiliary state z concatenated to observations."""
+    """Epigraph action value Q_hat(x, z, a)."""
     base_cls: nn.Module
 
     @nn.compact
     def __call__(
         self, observations: jnp.ndarray, z: jnp.ndarray, actions: jnp.ndarray, *args, **kwargs
     ) -> jnp.ndarray:
-        # Concatenate observations with z, then with actions
         inputs = jnp.concatenate([observations, z, actions], axis=-1)
         outputs = self.base_cls()(inputs, *args, **kwargs)
-
         value = nn.Dense(1, kernel_init=default_init())(outputs)
-
         return jnp.squeeze(value, -1)
